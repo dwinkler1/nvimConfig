@@ -29,7 +29,7 @@
 
   # Standard R packages used by default in rWrapper and quarto
   reqPkgs = with rpkgs.rPackages; [
-    languageserver
+#    languageserver
   ];
 in {
   inherit rpkgs;

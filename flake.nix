@@ -47,7 +47,7 @@
           nix = true;
           optional = false;
           python = false;
-          r = true;
+          r = false;
         };
 
         settings = {
@@ -132,8 +132,8 @@
       in {
         default = nvimPkg;
         vv = nvimPkg;
-        vim = nvimPkg;
-        nvim = nvimPkg;
+        #vim = nvimPkg;
+        #nvim = nvimPkg;
       }
     );
 

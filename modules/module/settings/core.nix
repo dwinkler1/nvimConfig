@@ -28,7 +28,7 @@
   config.settings.dont_link = false;
 
   # Create additional aliases for the binary
-  config.settings.aliases = [ "vim" ];
+  config.settings.aliases = [ "vvim" ];
 
   # Enable wrapper handling of spec runtimeDeps (template pattern).
   config.settings.autowrapRuntimeDeps = true;
