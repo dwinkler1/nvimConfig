@@ -1,0 +1,133 @@
+{
+  "nodes": {
+    "fran": {
+      "inputs": {
+        "nixpkgs": [
+          "rixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1768802006,
+        "narHash": "sha256-czGb4RwTBahNNK9S7ySXeTWIrn/jKH+74hN/uIS2XrM=",
+        "owner": "dwinkler1",
+        "repo": "fran",
+        "rev": "a3879317519fd3685f3b7679a1de4c5ae65a7cb9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "dwinkler1",
+        "repo": "fran",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1769598131,
+        "narHash": "sha256-e7VO/kGLgRMbWtpBqdWl0uFg8Y2XWFMdz0uUJvlML8o=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "fa83fd837f3098e3e678e6cf017b2b36102c7211",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixos-25.11",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "plugins-cmp-pandoc-references": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1743491695,
+        "narHash": "sha256-XsdneGNJzmRBggk8lz9JNDQYk7wbYfUAF2oZLXzFb9c=",
+        "owner": "jmbuhr",
+        "repo": "cmp-pandoc-references",
+        "rev": "130eae4f75029d6495808e0ea4b769fa1ce4c9ac",
+        "type": "github"
+      },
+      "original": {
+        "owner": "jmbuhr",
+        "repo": "cmp-pandoc-references",
+        "type": "github"
+      }
+    },
+    "plugins-cmp-r": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1764700377,
+        "narHash": "sha256-xb7VFWM/BKAkN7fg62y8n618t2qkQjdYbPwhBhLJwtk=",
+        "owner": "R-nvim",
+        "repo": "cmp-r",
+        "rev": "70bfe8f4c062acc10266e24825439c009a0b1b89",
+        "type": "github"
+      },
+      "original": {
+        "owner": "R-nvim",
+        "repo": "cmp-r",
+        "type": "github"
+      }
+    },
+    "plugins-r": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1769736135,
+        "narHash": "sha256-T4QgcBL+LCXvrEiRE2JW4jtUKl8DKzFHk8czGUO1jgY=",
+        "owner": "R-nvim",
+        "repo": "R.nvim",
+        "rev": "2701ec64f5485e17c0e057081a9ae2058d776464",
+        "type": "github"
+      },
+      "original": {
+        "owner": "R-nvim",
+        "repo": "R.nvim",
+        "type": "github"
+      }
+    },
+    "rixpkgs": {
+      "locked": {
+        "lastModified": 1768825970,
+        "narHash": "sha256-m/BI9IO7tMuOSdVNSqr0knQ4V9R6rgSXyGQOp3FovSA=",
+        "type": "tarball",
+        "url": "https://github.com/rstats-on-nix/nixpkgs/archive/2026-01-19.tar.gz"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://github.com/rstats-on-nix/nixpkgs/archive/2026-01-19.tar.gz"
+      }
+    },
+    "root": {
+      "inputs": {
+        "fran": "fran",
+        "nixpkgs": "nixpkgs",
+        "plugins-cmp-pandoc-references": "plugins-cmp-pandoc-references",
+        "plugins-cmp-r": "plugins-cmp-r",
+        "plugins-r": "plugins-r",
+        "rixpkgs": "rixpkgs",
+        "wrappers": "wrappers"
+      }
+    },
+    "wrappers": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1769731670,
+        "narHash": "sha256-iHq0bwOsDI5IkJuxVsljdztZdVKIBb8yO0RBRMrco68=",
+        "owner": "BirdeeHub",
+        "repo": "nix-wrapper-modules",
+        "rev": "4622dd5ef8e152475fce48307d3bc77211249c6a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "BirdeeHub",
+        "repo": "nix-wrapper-modules",
+        "type": "github"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}
