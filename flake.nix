@@ -108,11 +108,11 @@
       default = nixpkgs.lib.composeManyExtensions [
         dependencyOverlay
         (final: prev: {
-          n = wrapper.config.wrap {pkgs = final;};
+          vv = wrapper.config.wrap {pkgs = final;};
         })
       ];
       dependencies = dependencyOverlay;
-      n = self.overlays.default;
+      vv = self.overlays.default;
     };
 
     wrapperModules = {
@@ -131,7 +131,7 @@
         nvimPkg = wrapperSettings pkgs;
       in {
         default = nvimPkg;
-        n = nvimPkg;
+        vv = nvimPkg;
         vim = nvimPkg;
         nvim = nvimPkg;
       }
@@ -171,8 +171,8 @@
           pkgs.runCommand "check-module-eval" {} ''
             echo "Module evaluation successful" > $out
           '';
-        package-build = pkgs.runCommand "check-n" {} ''
-          BINARY_PATH="${nvimPkg}/bin/n"
+        package-build = pkgs.runCommand "check-vv" {} ''
+          BINARY_PATH="${nvimPkg}/bin/vv"
 
           if [ ! -x "$BINARY_PATH" ]; then
             echo "Error: Binary n not found or not executable"
