@@ -1,7 +1,7 @@
 _G.Config = {}
 local nix = require('config.nix').init { non_nix_value = true }
 Config.isNixCats = nix.is_nix
-
+Config.nixConfig = nix
 
 require('lze').register_handlers(require('nixCatsUtils.lzUtils').for_cat)
 
