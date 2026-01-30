@@ -1,0 +1,39 @@
+name: "Test Cats"
+on:
+  workflow_dispatch: # allows manual triggering
+  push:
+    paths:
+      - 'flake.lock'
+      - 'flake.nix'
+      - 'modules'
+  pull_request:
+    paths:
+      - 'flake.lock'
+      - 'flake.nix'
+      - 'modules'
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  tests:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+    - uses: actions/checkout@v4
+    - uses: wimpysworld/nothing-but-nix@main
+      if: runner.os == 'Linux'
+      with:
+        hatchet-protocol: 'carve'
+    - uses: cachix/install-nix-action@v31
+      with:
+        github_access_token: ${{ secrets.GITHUB_TOKEN }}
+    - uses: cachix/cachix-action@v14
+      with:
+        name: rde
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+        extraPullNames: rstats-on-nix, nix-community    
+    - run: nix build
+    - run: nix develop
+    - run: nix flake check

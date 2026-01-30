@@ -1,0 +1,32 @@
+name: update-flake-lock
+
+on:
+  workflow_dispatch: # allows manual triggering
+  schedule:
+    - cron: '0 3 * * *'
+
+jobs:
+  lockfile1:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - uses: wimpysworld/nothing-but-nix@main
+        with:
+          hatchet-protocol: 'carve'
+      - name: Install Determinate Nix
+        uses: DeterminateSystems/determinate-nix-action@v3
+      - uses: cachix/cachix-action@v14
+        with:
+          name: rde
+          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+          extraPullNames: rstats-on-nix, nix-community
+      - name: Update flake.lock
+        uses: DeterminateSystems/update-flake-lock@v25
+        with:
+          token: ${{ secrets.GH_TOKEN_FOR_UPDATES }}
+          branch: update
+          pr-title: "Update flake.lock" # Title of PR to be created
+          pr-labels: |                  # Labels to be set on the PR
+            dependencies
+            automated
