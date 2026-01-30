@@ -19,7 +19,7 @@
     lib.optionals (config.cats.general or false) [ lp.tiktoken_core ];
 
   # Binary name for the wrapper
-  config.binName = lib.mkDefault "n";
+  config.binName = lib.mkDefault "wrapped";
 
   # Prevent neovim from loading system-wide config
   config.settings.block_normal_config = true;

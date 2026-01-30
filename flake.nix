@@ -132,8 +132,6 @@
       in {
         default = nvimPkg;
         vv = nvimPkg;
-        #vim = nvimPkg;
-        #nvim = nvimPkg;
       }
     );
 
