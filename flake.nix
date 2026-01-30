@@ -47,7 +47,7 @@
           nix = true;
           optional = false;
           python = false;
-          r = false;
+          r = pkgs.lib.mkDefault false;
         };
 
         settings = {
