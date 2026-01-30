@@ -8,7 +8,7 @@
   config.settings.config_directory = ../../..;
 
   # Default colorscheme and background
-  config.settings.colorscheme = lib.mkDefault "kanagawa";
+  config.settings.colorscheme = lib.mkDefault "cyberdream";
   config.settings.background = lib.mkDefault "dark";
 
   # Enable RC wrapping (allows neovim to find the config)

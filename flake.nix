@@ -71,11 +71,11 @@
 
             julia = ["DataFramesMeta" "QuackIO"];
           };
-          colorscheme = "cyberdream";
-          background = "dark";
-          wrapRc = true;
+          colorscheme = def "cyberdream";
+          background = def "dark";
+          wrapRc = def true;
         };
-        binName = "vv";
+        binName = def "vv";
       };
 
     systems = [
