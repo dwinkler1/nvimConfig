@@ -50,24 +50,30 @@
           r = true;
         };
 
-        settings.lang_packages = {
-          python = with pkgs.python3Packages; [
-            duckdb
-            polars
-          ];
+        settings = {
+          lang_packages = {
+            python = with pkgs.python3Packages; [
+              duckdb
+              polars
+            ];
 
-          r = with pkgs.rpkgs.rPackages; [
-            arrow
-            broom
-            data_table
-            duckdb
-            janitor
-            styler
-            tidyverse
-          ];
+            r = with pkgs.rpkgs.rPackages; [
+              arrow
+              broom
+              data_table
+              duckdb
+              janitor
+              styler
+              tidyverse
+            ];
 
-          julia = ["DataFramesMeta" "QuackIO"];
+            julia = ["DataFramesMeta" "QuackIO"];
+          };
+          colorscheme = "cyberdream";
+          background = "dark";
+          wrapRc = true;
         };
+          binName = "vv";
       };
 
     systems = [
@@ -144,7 +150,7 @@
         nvimPkg = wrapperSettings pkgs;
       in {
         default = pkgs.mkShell {
-          name = "n";
+          name = "vShell";
           packages = [nvimPkg];
           nativeBuildInputs = with pkgs; [] ++ (pkgs.lib.optionals self.wrappers.default.cats.optional [devenv]);
           inputsFrom = [];
@@ -186,12 +192,12 @@
     );
 
     nixosModules.default = wrappers.lib.mkInstallModule {
-      name = "n";
+      name = "vModule";
       value = module;
     };
 
     homeModules.default = wrappers.lib.mkInstallModule {
-      name = "n";
+      name = "vModule";
       value = module;
       loc = ["home" "packages"];
     };

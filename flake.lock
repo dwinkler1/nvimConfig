@@ -52,22 +52,6 @@
         "type": "github"
       }
     },
-    "plugins-cmp-r": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1764700377,
-        "narHash": "sha256-xb7VFWM/BKAkN7fg62y8n618t2qkQjdYbPwhBhLJwtk=",
-        "owner": "R-nvim",
-        "repo": "cmp-r",
-        "rev": "70bfe8f4c062acc10266e24825439c009a0b1b89",
-        "type": "github"
-      },
-      "original": {
-        "owner": "R-nvim",
-        "repo": "cmp-r",
-        "type": "github"
-      }
-    },
     "plugins-r": {
       "flake": false,
       "locked": {
@@ -101,7 +85,6 @@
         "fran": "fran",
         "nixpkgs": "nixpkgs",
         "plugins-cmp-pandoc-references": "plugins-cmp-pandoc-references",
-        "plugins-cmp-r": "plugins-cmp-r",
         "plugins-r": "plugins-r",
         "rixpkgs": "rixpkgs",
         "wrappers": "wrappers"

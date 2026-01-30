@@ -8,18 +8,18 @@
   config.settings.config_directory = ../../..;
 
   # Default colorscheme and background
-  config.settings.colorscheme = "kanagawa";
-  config.settings.background = "dark";
+  config.settings.colorscheme = lib.mkDefault "kanagawa";
+  config.settings.background = lib.mkDefault "dark";
 
   # Enable RC wrapping (allows neovim to find the config)
-  config.settings.wrapRc = true;
+  config.settings.wrapRc = lib.mkDefault true;
 
   # Lua packages available to neovim (for :lua require())
   config.settings.nvim_lua_env = lp:
     lib.optionals (config.cats.general or false) [ lp.tiktoken_core ];
 
   # Binary name for the wrapper
-  config.binName = "n";
+  config.binName = lib.mkDefault "n";
 
   # Prevent neovim from loading system-wide config
   config.settings.block_normal_config = true;
