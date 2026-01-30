@@ -22,13 +22,6 @@
     ];
   };
 
-  config.specs.r-lazy = {
-    lazy = true;
-    data = [
-      config.nvim-lib.neovimPlugins.cmp-r
-    ];
-  };
-
   config.specs.general = {
     data = with pkgs.vimPlugins; [
       lze

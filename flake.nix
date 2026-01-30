@@ -22,10 +22,7 @@
       url = "github:R-nvim/R.nvim";
       flake = false;
     };
-    "plugins-cmp-r" = {
-      url = "github:R-nvim/cmp-r";
-      flake = false;
-    };
+
     "plugins-cmp-pandoc-references" = {
       url = "github:jmbuhr/cmp-pandoc-references";
       flake = false;
