@@ -40,7 +40,7 @@
     julia = lib.mkDefault false;
     lua = lib.mkDefault false;
     markdown = lib.mkDefault false;
-    nix = lib.mkDefault false;
+    nix = lib.mkDefault true;
     optional = lib.mkDefault false;
     python = lib.mkDefault false;
     r = lib.mkDefault false;

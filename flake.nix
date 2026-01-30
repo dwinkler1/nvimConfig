@@ -35,19 +35,21 @@
     wrappers,
     ...
   } @ inputs: let
-    wrapperSettings = pkgs:
+    wrapperSettings = pkgs: let
+      def = pkgs.lib.mkDefault;
+    in
       wrapper.config.wrap {
         inherit pkgs;
         cats = {
-          clickhouse = false;
-          gitPlugins = false;
-          julia = false;
-          lua = false;
-          markdown = false;
-          nix = true;
-          optional = false;
-          python = false;
-          r = pkgs.lib.mkDefault false;
+          clickhouse = def false;
+          gitPlugins = def true;
+          julia = def false;
+          lua = def false;
+          markdown = def false;
+          nix = def true;
+          optional = def false;
+          python = def false;
+          r = def false;
         };
 
         settings = {
@@ -73,7 +75,7 @@
           background = "dark";
           wrapRc = true;
         };
-          binName = "vv";
+        binName = "vv";
       };
 
     systems = [
