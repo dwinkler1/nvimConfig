@@ -19,7 +19,7 @@ later(function()
       json = { "prettier" },
       python = { "ruff_format", "ruff_organize_imports" },
       nix = { "alejandra" },
-      -- r = { "my_styler" },
+      r = { "air" },
       rmd = { "injected" },
       quarto = { "injected" },
     },
