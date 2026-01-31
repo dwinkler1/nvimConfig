@@ -190,89 +190,8 @@ end)
 -- Treesitter
 
 now_if_args(function()
-  vim.treesitter.language.register("markdown", { "markdown", "codecompanion" })
+  vim.treesitter.language.register("markdown", { "markdown", "codecompanion", "rmd", "quarto" })
 
-  -- Base configuration
-  local opts = {
-    highlight = { enable = true },
-    indent = { enable = false },
-    textobjects = {
-      move = {
-        enable = true,
-        set_jumps = true, -- whether to set jumps in the jumplist
-        goto_next_start = {
-          ["]a"] = "@paramter.inner",
-          ["]f"] = "@function.outer",
-          ["]o"] = "@loop.*",
-          ["]s"] = { query = "@local.scope", desc = "Next scope" },
-          ["]z"] = { query = "@fold", desc = "Next fold" },
-        },
-        goto_next_end = {
-          ["]M"] = "@function.outer",
-          ["]["] = "@class.outer",
-        },
-        goto_previous_start = {
-          ["[a"] = "@parameter.inner",
-          ["[f"] = "@function.outer",
-          ["[o"] = "@loop.*",
-          ["[s"] = { query = "@local.scope", query_group = "locals", desc = "Prev. scope" },
-          ["[z"] = { query = "@fold", query_group = "folds", desc = "Prev. fold" },
-        },
-        goto_previous_end = {
-          ["[M"] = "@function.outer",
-          ["[]"] = "@class.outer",
-        },
-        goto_next = {
-          ["]e"] = "@conditional.outer",
-        },
-        goto_previous = {
-          ["[e"] = "@conditional.outer",
-        }
-      },
-      swap = {
-        enable = true,
-        swap_next = {
-          ["<leader>x"] = "@parameter.inner",
-        },
-        swap_previous = {
-          ["<leader>X"] = "@parameter.inner",
-        },
-      },
-      lsp_interop = {
-        enable = true,
-        border = 'none',
-        floating_preview_opts = {},
-        peek_definition_code = {
-          ["<leader>lm"] = "@function.outer",
-          ["<leader>lM"] = "@class.outer",
-        },
-      },
-    },
-  }
-
-  -- Environment-specific Overrides
-  if not Config.isNixCats then
-    opts.auto_install = true
-    opts.ensure_installed = Config.treesitter_helpers.default_parsers
-  else
-    opts.auto_install = false
-    -- Nix handles installation, so ensure_installed is skipped/empty
-  end
-
-  -- Manual parser check for non-Nix users
-  if not Config.isNixCats then
-    local installed_check = function(lang)
-      return #vim.api.nvim_get_runtime_file("parser/" .. lang .. ".*", false) == 0
-    end
-    local to_install = vim.tbl_filter(installed_check, opts.ensure_installed)
-    if #to_install > 0 then
-      require("nvim-treesitter").install(to_install)
-    end
-  end
-
-
-  local configs = require("nvim-treesitter.configs")
-  configs.setup(opts)
   require 'treesitter-context'.setup {
     enable = true,
     multiwindow = false,      -- Enable multiwindow support.
@@ -288,6 +207,181 @@ now_if_args(function()
     zindex = 20,     -- The Z-index of the context window
     on_attach = nil, -- (fun(buf: integer): boolean) return false to disable attaching
   }
+
+
+  local ok_configs, configs = pcall(require, "nvim-treesitter.configs")
+
+  if ok_configs and configs.setup then
+    local opts = {
+      highlight = { enable = true },
+      indent = { enable = false },
+      textobjects = {
+        move = {
+          enable = true,
+          set_jumps = true,
+          goto_next_start = {
+            ["]a"] = "@parameter.inner", -- fixed typo
+            ["]f"] = "@function.outer",
+            ["]o"] = "@loop.*",
+            ["]s"] = { query = "@local.scope", desc = "Next scope" },
+            ["]z"] = { query = "@fold", desc = "Next fold" },
+          },
+          goto_next_end = {
+            ["]M"] = "@function.outer",
+            ["]["] = "@class.outer",
+          },
+          goto_previous_start = {
+            ["[a"] = "@parameter.inner",
+            ["[f"] = "@function.outer",
+            ["[o"] = "@loop.*",
+            ["[s"] = { query = "@local.scope", query_group = "locals", desc = "Prev. scope" },
+            ["[z"] = { query = "@fold", query_group = "folds", desc = "Prev. fold" },
+          },
+          goto_previous_end = {
+            ["[M"] = "@function.outer",
+            ["[]"] = "@class.outer",
+          },
+          goto_next = {
+            ["]e"] = "@conditional.outer",
+          },
+          goto_previous = {
+            ["[e"] = "@conditional.outer",
+          },
+        },
+        swap = {
+          enable = true,
+          swap_next = {
+            ["<leader>x"] = "@parameter.inner",
+          },
+          swap_previous = {
+            ["<leader>X"] = "@parameter.inner",
+          },
+        },
+        lsp_interop = {
+          enable = true,
+          border = "none",
+          floating_preview_opts = {},
+          peek_definition_code = {
+            ["<leader>lm"] = "@function.outer",
+            ["<leader>lM"] = "@class.outer",
+          },
+        },
+      },
+    }
+
+
+    -- Manual parser check for non-Nix users
+    if not Config.isNixCats then
+      local installed_check = function(lang)
+        return #vim.api.nvim_get_runtime_file("parser/" .. lang .. ".*", false) == 0
+      end
+      local to_install = vim.tbl_filter(installed_check, opts.ensure_installed)
+      if #to_install > 0 then
+        require("nvim-treesitter").install(to_install)
+      end
+    end
+    -- Environment-specific Overrides
+    if not Config.isNixCats then
+      opts.auto_install = true
+      opts.ensure_installed = Config.treesitter_helpers.default_parsers
+    else
+      opts.auto_install = false
+      -- Nix handles installation, so ensure_installed is skipped/empty
+    end
+
+
+    configs.setup(opts)
+    return
+  end
+
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = "*",
+    callback = function(args)
+      -- Use explicit buffer + filetype to avoid any ambiguity
+      local ok = pcall(vim.treesitter.start, args.buf, args.match)
+      vim.bo.syntax = 'on'
+    end,
+  })
+
+  -- Textobjects: require plugin and bail out quietly if missing
+  local ok_nto, nto = pcall(require, "nvim-treesitter-textobjects")
+  if not ok_nto then
+    return
+  end
+
+  nto.setup({
+    move = {
+      set_jumps = true,
+    },
+  })
+
+  local move = require("nvim-treesitter-textobjects.move")
+  local swap = require("nvim-treesitter-textobjects.swap")
+
+  -- Map motion function names to actual functions
+  local move_fns = {
+    goto_next_start     = move.goto_next_start,
+    goto_next_end       = move.goto_next_end,
+    goto_previous_start = move.goto_previous_start,
+    goto_previous_end   = move.goto_previous_end,
+    goto_next           = move.goto_next,
+    goto_previous       = move.goto_previous,
+  }
+
+  -- All motions defined in one place
+  -- spec = { query_or_list, query_group, desc }
+  local move_maps = {
+    goto_next_start = {
+      ["]a"] = { "@parameter.inner", "textobjects", "Next parameter" },
+      ["]f"] = { "@function.outer", "textobjects", "Next function start" },
+      ["]o"] = { { "@loop.inner", "@loop.outer" }, "textobjects", "Next loop" },
+      ["]s"] = { "@local.scope", "locals", "Next scope" },
+      ["]z"] = { "@fold", "folds", "Next fold" },
+    },
+    goto_next_end = {
+      ["]M"] = { "@function.outer", "textobjects", "Next function end" },
+      ["]["] = { "@class.outer", "textobjects", "Next class end" },
+    },
+    goto_previous_start = {
+      ["[a"] = { "@parameter.inner", "textobjects", "Previous parameter" },
+      ["[f"] = { "@function.outer", "textobjects", "Previous function start" },
+      ["[o"] = { { "@loop.inner", "@loop.outer" }, "textobjects", "Previous loop" },
+      ["[s"] = { "@local.scope", "locals", "Previous scope" },
+      ["[z"] = { "@fold", "folds", "Previous fold" },
+    },
+    goto_previous_end = {
+      ["[M"] = { "@function.outer", "textobjects", "Previous function end" },
+      ["[]"] = { "@class.outer", "textobjects", "Previous class end" },
+    },
+    goto_next = {
+      ["]e"] = { "@conditional.outer", "textobjects", "Next conditional" },
+    },
+    goto_previous = {
+      ["[e"] = { "@conditional.outer", "textobjects", "Previous conditional" },
+    },
+  }
+
+  -- Generate motion keymaps
+  for fn_name, maps in pairs(move_maps) do
+    local fn = move_fns[fn_name]
+    if fn then
+      for lhs, spec in pairs(maps) do
+        local query_or_list, group, desc = spec[1], spec[2], spec[3]
+        vim.keymap.set({ "n", "x", "o" }, lhs, function()
+          fn(query_or_list, group)
+        end, { desc = desc })
+      end
+    end
+  end
+
+  -- Swap keymaps (unchanged, but minimal)
+  vim.keymap.set("n", "<leader>x", function()
+    swap.swap_next("@parameter.inner")
+  end, { desc = "Swap with next parameter" })
+
+  vim.keymap.set("n", "<leader>X", function()
+    swap.swap_previous("@parameter.inner")
+  end, { desc = "Swap with previous parameter" })
 end)
 
 -- zk

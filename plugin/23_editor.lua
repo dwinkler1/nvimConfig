@@ -17,7 +17,7 @@ later(function()
     formatters_by_ft = {
       javascript = { "prettier" },
       json = { "prettier" },
-      python = { "black" },
+      python = { "ruff_format", "ruff_organize_imports" },
       nix = { "alejandra" },
       -- r = { "my_styler" },
       rmd = { "injected" },

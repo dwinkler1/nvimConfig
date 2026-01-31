@@ -4,7 +4,8 @@
   description = "Daniel's NixCats";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    #nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
     wrappers = {
       url = "github:BirdeeHub/nix-wrapper-modules";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -44,7 +45,7 @@
           clickhouse = def false;
           gitPlugins = def true;
           julia = def false;
-          lua = def false;
+          lua = def true;
           markdown = def false;
           nix = def true;
           optional = def false;

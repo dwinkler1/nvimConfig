@@ -50,6 +50,7 @@ now_if_args(function()
           },
           diagnostics = {
             disable = { "trailing-space" },
+            globals = { "vim" },
           },
           workspace = {
             checkThirdParty = false,

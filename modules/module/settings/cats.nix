@@ -38,7 +38,7 @@
     general = lib.mkDefault true;
     gitPlugins = lib.mkDefault true;
     julia = lib.mkDefault false;
-    lua = lib.mkDefault false;
+    lua = lib.mkDefault true;
     markdown = lib.mkDefault false;
     nix = lib.mkDefault true;
     optional = lib.mkDefault false;
