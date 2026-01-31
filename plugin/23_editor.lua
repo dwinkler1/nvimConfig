@@ -24,7 +24,9 @@ later(function()
       quarto = { "injected" },
     },
 
-    lsp_format = "fallback",
+    default_format_opts = {
+      lsp_format = "fallback",
+    },
 
     formatters = {
       my_styler = {

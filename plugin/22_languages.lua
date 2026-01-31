@@ -32,7 +32,7 @@ now_if_args(function()
   add("render-markdown.nvim")
   require('render-markdown').setup({
     --    completions = { blink = { enabled = true } },
-    file_types = { 'markdown', 'quarto', 'rmd', 'codecompanion', },
+    file_types = { 'markdown', 'codecompanion', },
     link = {
       wiki = {
         body = function(ctx)
