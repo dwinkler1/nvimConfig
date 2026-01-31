@@ -300,6 +300,9 @@ now_if_args(function()
       -- Use explicit buffer + filetype to avoid any ambiguity
       local ok = pcall(vim.treesitter.start, args.buf, args.match)
       vim.bo.syntax = 'on'
+      vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+      vim.wo[0][0].foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+      vim.wo[0][0].foldmethod = 'expr'
     end,
   })
 
@@ -309,6 +312,7 @@ now_if_args(function()
     return
   end
 
+  vim.g.no_plugin_maps = true
   nto.setup({
     move = {
       set_jumps = true,
