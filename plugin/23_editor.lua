@@ -322,6 +322,7 @@ later(function()
     snippets = {
       -- Load custom file with global snippets first (adjust for Windows)
       gen_loader.from_file(vim.fn.stdpath('config') .. "/snippets/global.json"),
+      gen_loader.from_file("./snippets/quarto.json"),
 
       -- Load snippets based on current language by reading files from
       -- "snippets/" subdirectories from 'runtimepath' directories.
