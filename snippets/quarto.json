@@ -1,7 +1,7 @@
 {
   "Chunk": {
     "prefix": "_r",
-    "body": ["```{r}", "$1", "```"],
+    "body": "```{r}\n$1\n```",
     "description": "R code block"
   }
 }
