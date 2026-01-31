@@ -97,9 +97,9 @@ later(function()
         enabled = true,
       },
     },
-    codeRunner = {
-      enabled = true,
-      default_method = "slime",
-    },
+    -- codeRunner = {
+    --   enabled = true,
+    --   default_method = "slime",
+    -- },
   })
 end)
