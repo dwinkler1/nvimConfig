@@ -1,0 +1,6 @@
+{
+  "Function": {
+    "prefix": "fn",
+    "body": "$1 <- function($2){\n$0\n}"
+  }
+}
