@@ -1,7 +1,17 @@
 {
-  "Chunk": {
+  "R Chunk": {
     "prefix": "_r",
-    "body": "```{r}\n$1\n```",
+    "body": "```{r}\n$0\n```",
     "description": "R code block"
+  },
+  "Chunk": {
+    "prefix": "_c",
+    "body": "```{$1}\n$0\n```",
+    "description": "Code block with specified language"
+  },
+  "YAML Header": {
+    "prefix": "_yaml",
+    "body": "---\ntitle: \"$1\"\nauthor: \"$2\"\ndate: \"$3\"\nformat: html\n---\n$0",
+    "description": "YAML header for Quarto document"
   }
 }
