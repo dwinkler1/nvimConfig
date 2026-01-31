@@ -1,0 +1,13 @@
+{
+  "Chunk": {
+    "R": {
+      "prefix": "_r",
+      "body": [
+        "```{r}",
+        "$1",
+        "```"
+      ],
+      "description": "R code block"
+    }
+  }
+}
