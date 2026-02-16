@@ -10,7 +10,7 @@
       url = "github:BirdeeHub/nix-wrapper-modules";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    rixpkgs.url = "https://github.com/rstats-on-nix/nixpkgs/archive/2026-01-19.tar.gz";
+    rixpkgs.url = "github:dwinkler1/rixpkgs/nixpkgs";
 
     fran = {
       url = "github:dwinkler1/fran";
@@ -50,7 +50,7 @@
           nix = def true;
           optional = def false;
           python = def false;
-          r = def false;
+          r = true;
         };
 
         settings = {
@@ -68,6 +68,7 @@
               janitor
               styler
               tidyverse
+              pkgs.extraRPackages.synthdid
             ];
 
             julia = ["DataFramesMeta" "QuackIO"];

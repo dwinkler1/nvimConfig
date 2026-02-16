@@ -23,13 +23,19 @@
 #
 # Update the R snapshot date in flake.nix inputs section:
 #   rixpkgs.url = "github:rstats-on-nix/nixpkgs/YYYY-MM-DD"
-{rixpkgs, ...}: final: prev: let
+{
+  inputs,
+  ...
+}: final: prev: let
   # R packages from rstats-on-nix for the current system
-  rpkgs = rixpkgs.legacyPackages.${prev.stdenv.hostPlatform.system};
+  rpkgs = import inputs.rixpkgs {
+    system = prev.stdenv.hostPlatform.system;
+    overlays = [inputs.fran.overlays.default];
+  }; # rixpkgs.legacyPackages.${prev.stdenv.hostPlatform.system};
 
   # Standard R packages used by default in rWrapper and quarto
   reqPkgs = with rpkgs.rPackages; [
-#    languageserver
+    #    languageserver
   ];
 in {
   inherit rpkgs;
@@ -42,5 +48,5 @@ in {
   quarto = rpkgs.quarto.override {extraRPackages = reqPkgs;};
 
   # Update helper for rix
-  updateR = import ../scripts/updater.nix { pkgs = final; };
+  updateR = import ../scripts/updater.nix {pkgs = final;};
 }

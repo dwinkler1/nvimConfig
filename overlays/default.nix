@@ -2,7 +2,7 @@
 let
   lib = nixpkgs.lib;
 
-  rOverlay = import ./r.nix inputs;
+  rOverlay = import ./r.nix {inherit inputs;};
   franOverlay = inputs.fran.overlays.default;
   pythonOverlay = import ./python.nix inputs;
   pluginsOverlay = import ./plugins.nix inputs;
