@@ -68,7 +68,7 @@
               janitor
               styler
               tidyverse
-              pkgs.extraRPackages.synthdid
+              pkgs.rpkgs.extraRPackages.synthdid
             ];
 
             julia = ["DataFramesMeta" "QuackIO"];

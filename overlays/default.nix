@@ -9,7 +9,6 @@ let
 
   dependencyOverlays = [
     rOverlay
-    franOverlay
     pythonOverlay
     pluginsOverlay
   ];
