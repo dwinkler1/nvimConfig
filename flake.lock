@@ -70,11 +70,11 @@
     },
     "rixpkgs": {
       "locked": {
-        "lastModified": 1770939586,
-        "narHash": "sha256-rp9f5NCjB4jRlY7Hl/I4OLN3i0wXpyBAyQKZYKZPRH0=",
+        "lastModified": 1771303851,
+        "narHash": "sha256-tgveHozOJ2D/mi3LxVy/FcmLFDlM5XKZxsNB2XpvzaM=",
         "owner": "dwinkler1",
         "repo": "rixpkgs",
-        "rev": "e99809ceb6b4d52b970b2fedfb19c92880cef97a",
+        "rev": "af2dd3f7b4b172077747c0869d4e30702fb71b0e",
         "type": "github"
       },
       "original": {
