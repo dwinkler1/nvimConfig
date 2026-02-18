@@ -50,7 +50,7 @@
           nix = def true;
           optional = def false;
           python = def false;
-          r = true;
+          r = def false;
         };
 
         settings = {
@@ -64,11 +64,8 @@
               arrow
               broom
               data_table
-              duckdb
               janitor
               styler
-              tidyverse
-              pkgs.rpkgs.extraRPackages.synthdid
             ];
 
             julia = ["DataFramesMeta" "QuackIO"];
