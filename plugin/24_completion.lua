@@ -1,5 +1,6 @@
 local add = Config.add
 local later = MiniDeps.later
+local now = MiniDeps.now
 local now_if_args = Config.now_if_args
 
 -- Constants
@@ -83,16 +84,33 @@ end
 
 local function get_codecompanion_config()
   return {
-    adapters = {
-      http = {
-        copilot = function()
-          return require("codecompanion.adapters").extend("copilot", {
-            schema = {
-              model = { default = "gemini-3-pro-preview" }
-            }
-          })
-        end,
-      }
+    interactions = {
+      chat = {
+        adapter = {
+          name = "copilot",
+          model = "gemini-3.1-pro-preview",
+        },
+        opts = {
+          completion_provider = "blink",
+        },
+      },
+      inline = {
+        adapter = {
+          name = "copilot",
+          model = "gemini-3.1-pro-preview",
+        }
+      },
+      keymaps = {
+        accept_change = {
+          modes = { n = "ga" },
+          description = "Accept the suggested change",
+        },
+        reject_change = {
+          modes = { n = "gr" },
+          opts = { nowait = true },
+          description = "Reject the suggested change",
+        },
+      },
     },
     display = {
       chat = {
@@ -105,10 +123,10 @@ local function get_codecompanion_config()
       },
     },
     prompt_library = {
-      ["Code Expert"] = {
-        strategy = "chat",
+      ["expert"] = {
+        interaction = "chat",
         description = "Get expert advice from an LLM",
-        opts = create_common_opts("<localleader>ae", "expert"),
+        --opts = create_common_opts("<localleader>ae", "expert"),
         prompts = {
           {
             role = "system",
@@ -125,10 +143,10 @@ local function get_codecompanion_config()
           },
         },
       },
-      ["Code Fixer"] = {
-        strategy = "chat",
+      ["fixer"] = {
+        interaction = "chat",
         description = "Fix code errors with expert guidance",
-        opts = create_common_opts("<localleader>af", "afixer"),
+        --opts = create_common_opts("<localleader>af", "afixer"),
         prompts = {
           {
             role = "system",
@@ -145,17 +163,10 @@ local function get_codecompanion_config()
           },
         },
       },
-      ["Suggest"] = {
-        strategy = "chat",
+      ["suggest"] = {
+        interaction = "chat",
         description = "Suggest improvements to the buffer",
-        opts = {
-          mapping = "<localleader>as",
-          modes = { "v" },
-          short_name = "suggest",
-          auto_submit = true,
-          user_prompt = false,
-          stop_context_insertion = false,
-        },
+        --opts = create_common_opts("<localleader>as", "suggest"),
         prompts = {
           {
             role = "system",
