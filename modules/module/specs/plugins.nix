@@ -10,8 +10,13 @@
   };
 
   config.specs.r = {
-    data = [
+    data = with pkgs.vimPlugins; [
       config.nvim-lib.neovimPlugins.r
+      quarto-nvim
+      {
+        data = otter-nvim;
+        pname = "otter";
+      }
     ];
   };
 
