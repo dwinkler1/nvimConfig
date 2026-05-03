@@ -36,45 +36,58 @@
     wrappers,
     ...
   } @ inputs: let
+    mkWrapperConfig = pkgs: {
+      cats = {
+        clickhouse = false;
+        gitPlugins = true;
+        julia = false;
+        lua = true;
+        markdown = false;
+        nix = true;
+        optional = false;
+        python = false;
+        r = false;
+      };
+      settings = {
+        lang_packages = {
+          python = with pkgs.python3Packages; [
+            duckdb
+            polars
+          ];
+          r = with pkgs.rpkgs.rPackages; [
+            arrow
+            broom
+            data_table
+            janitor
+            styler
+          ];
+          julia = ["DataFramesMeta" "QuackIO"];
+        };
+        colorscheme = "cyberdream";
+        background = "dark";
+        wrapRc = true;
+      };
+      binName = "vv";
+    };
+
     wrapperSettings = pkgs: let
+      cfg = mkWrapperConfig pkgs;
       def = pkgs.lib.mkDefault;
     in
       wrapper.config.wrap {
         inherit pkgs;
-        cats = {
-          clickhouse = def false;
-          gitPlugins = def true;
-          julia = def false;
-          lua = def true;
-          markdown = def false;
-          nix = def true;
-          optional = def false;
-          python = def false;
-          r = def false;
-        };
-
+        cats = pkgs.lib.mapAttrs (_: v: def v) cfg.cats;
         settings = {
           lang_packages = {
-            python = with pkgs.python3Packages; [
-              duckdb
-              polars
-            ];
-
-            r = with pkgs.rpkgs.rPackages; [
-              arrow
-              broom
-              data_table
-              janitor
-              styler
-            ];
-
-            julia = ["DataFramesMeta" "QuackIO"];
+            python = def cfg.settings.lang_packages.python;
+            r = def cfg.settings.lang_packages.r;
+            julia = def cfg.settings.lang_packages.julia;
           };
-          colorscheme = def "cyberdream";
-          background = def "dark";
-          wrapRc = def true;
+          colorscheme = def cfg.settings.colorscheme;
+          background = def cfg.settings.background;
+          wrapRc = def cfg.settings.wrapRc;
         };
-        binName = def "vv";
+        binName = def cfg.binName;
       };
 
     systems = [
@@ -146,12 +159,55 @@
     devShells = forAllSystems (
       system: let
         pkgs = mkPkgs system;
+        cfg = mkWrapperConfig pkgs;
         nvimPkg = wrapperSettings pkgs;
+
+        pythonPackages = let
+          python_packages_fn =
+            if pkgs ? basePythonPackages
+            then ps: pkgs.basePythonPackages ps ++ cfg.settings.lang_packages.python
+            else _: cfg.settings.lang_packages.python;
+        in
+          with pkgs; [
+            (python3.withPackages python_packages_fn)
+            nodejs
+            ruff
+            basedpyright
+            uv
+          ];
+
+        rPackages = let
+          r_packages = (pkgs.baseRPackages or []) ++ cfg.settings.lang_packages.r;
+        in
+          with pkgs; [
+            (rWrapper.override {packages = r_packages;})
+            radianWrapper
+            (quarto.override {extraRPackages = r_packages;})
+            air-formatter
+            yaml-language-server
+            updateR
+          ];
+
+        juliaPackages = let
+          julia_with_packages = pkgs.julia-bin.withPackages cfg.settings.lang_packages.julia;
+        in [julia_with_packages];
+
+        markdownPackages = with pkgs; [
+          python313Packages.pylatexenc
+          quarto
+          zk
+        ];
+
+        shellPackages = [nvimPkg]
+          ++ pkgs.lib.optionals cfg.cats.python pythonPackages
+          ++ pkgs.lib.optionals cfg.cats.r rPackages
+          ++ pkgs.lib.optionals cfg.cats.julia juliaPackages
+          ++ pkgs.lib.optionals cfg.cats.markdown markdownPackages;
       in {
         default = pkgs.mkShell {
           name = "vShell";
-          packages = [nvimPkg];
-          nativeBuildInputs = with pkgs; [] ++ (pkgs.lib.optionals self.wrappers.default.cats.optional [devenv]);
+          packages = shellPackages;
+          nativeBuildInputs = with pkgs; [] ++ (pkgs.lib.optionals cfg.cats.optional [devenv]);
           inputsFrom = [];
           shellHook = "";
         };
