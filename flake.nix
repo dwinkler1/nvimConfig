@@ -59,6 +59,7 @@
             broom
             data_table
             janitor
+            languageserver
             styler
           ];
           julia = ["DataFramesMeta" "QuackIO"];
