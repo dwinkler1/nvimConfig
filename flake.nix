@@ -20,7 +20,7 @@
     };
 
     "plugins-r" = {
-      url = "github:R-nvim/R.nvim";
+      url = "github:R-nvim/R.nvim/v0.99.4";
       flake = false;
     };
 
