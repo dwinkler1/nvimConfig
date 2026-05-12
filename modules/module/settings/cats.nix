@@ -43,7 +43,7 @@
     nix = lib.mkDefault true;
     optional = lib.mkDefault false;
     python = lib.mkDefault false;
-    r = lib.mkDefault false;
+    r = lib.mkDefault true;
     test = lib.mkDefault false;
     treesitterParsers = lib.mkDefault true;
     utils = lib.mkDefault true;

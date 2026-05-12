@@ -33,12 +33,38 @@
     overlays = [inputs.fran.overlays.default];
   }; # rixpkgs.legacyPackages.${prev.stdenv.hostPlatform.system};
 
+  # Pre-build nvimcom from R.nvim plugin source so R.nvim never tries to
+  # compile it at runtime into the read-only nix store.
+  nvimcom = final.stdenv.mkDerivation {
+    pname = "nvimcom";
+    version = "0.9.92";
+    src = inputs.plugins-r;
+    nativeBuildInputs = [
+      (rpkgs.rWrapper.override { packages = []; })
+    ];
+    buildPhase = ''
+      mkdir -p $out/bin
+      R CMD INSTALL -l $out nvimcom
+      cd rnvimserver
+      $CC -pthread -O2 -Wall \
+        complete.c resolve.c hover.c definition.c signature.c \
+        rhelp.c chunk.c roxygen.c data_structures.c logging.c \
+        rnvimserver.c obbr.c tcp.c utilities.c ../nvimcom/src/common.c \
+        -o $out/bin/rnvimserver
+      cd ..
+      mkdir -p $out/nvimcom/bin
+      cp $out/bin/rnvimserver $out/nvimcom/bin/rnvimserver
+      chmod +x $out/bin/rnvimserver $out/nvimcom/bin/rnvimserver
+    '';
+    installPhase = "true";
+  };
+
   # Standard R packages used by default in rWrapper and quarto
   reqPkgs = with rpkgs.rPackages; [
     #    languageserver
   ];
 in {
-  inherit rpkgs;
+  inherit rpkgs nvimcom;
   baseRPackages = reqPkgs;
 
   # R wrapper with standard packages

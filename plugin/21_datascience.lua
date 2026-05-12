@@ -44,6 +44,12 @@ end)
 -- r
 now(function()
   if nix.get_cat("r", false) then
+    local cwd = vim.fn.getcwd(-1)
+    vim.env.RNVIM_COMPLDIR = cwd .. "/.r-compl"
+    vim.env.R_LIBS_USER = (vim.env.R_LIBS_USER or ""):gsub("%$PWD", cwd)
+    vim.env.TMPDIR = cwd .. "/.r-tmp"
+    vim.fn.mkdir(vim.env.RNVIM_COMPLDIR, "p")
+    vim.fn.mkdir(vim.env.TMPDIR, "p")
     vim.g.rout_follow_colorscheme = true
     require("r").setup({
       -- Create a table with the options to be passed to setup()

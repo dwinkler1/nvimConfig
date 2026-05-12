@@ -46,7 +46,7 @@
         nix = true;
         optional = false;
         python = false;
-        r = false;
+        r = true;
       };
       settings = {
         lang_packages = {
@@ -199,7 +199,8 @@
           zk
         ];
 
-        shellPackages = [nvimPkg]
+        shellPackages =
+          [nvimPkg]
           ++ pkgs.lib.optionals cfg.cats.python pythonPackages
           ++ pkgs.lib.optionals cfg.cats.r rPackages
           ++ pkgs.lib.optionals cfg.cats.julia juliaPackages
@@ -210,7 +211,13 @@
           packages = shellPackages;
           nativeBuildInputs = with pkgs; [] ++ (pkgs.lib.optionals cfg.cats.optional [devenv]);
           inputsFrom = [];
-          shellHook = "";
+          shellHook = ''
+            echo 'I am a NixShell'
+            export R_HOME=$(R RHOME)
+            export R_LIBS_SITE=$(strings "$(command -v R)" | grep -oP '/nix/store/[^:]+/library' | sort -u | paste -sd: -)
+            export R_LIBS_USER="$PWD/.r-libs"
+            mkdir -p "$R_LIBS_USER"
+          '';
         };
       }
     );
