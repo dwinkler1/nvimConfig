@@ -10,7 +10,11 @@
       url = "github:BirdeeHub/nix-wrapper-modules";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    rixpkgs.url = "github:dwinkler1/rixpkgs/nixpkgs";
+    rixpkgs.url = "github:dwinkler1/rixpkgs/af2dd3f7b4b172077747c0869d4e30702fb71b0e";
+
+    r-nvim-nix.url = "github:dwinkler1/r_nvim_nix";
+    r-nvim-nix.inputs.rnvimsrc.follows = "plugins-r";
+    r-nvim-nix.inputs.nixpkgs.follows = "rixpkgs";
 
     fran = {
       url = "github:dwinkler1/fran";
@@ -61,6 +65,7 @@
             janitor
             languageserver
             styler
+            pkgs.nvimcom
           ];
           julia = ["DataFramesMeta" "QuackIO"];
         };
@@ -187,6 +192,8 @@
             air-formatter
             yaml-language-server
             updateR
+            nvimcom
+            rnvimserver
           ];
 
         juliaPackages = let

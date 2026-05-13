@@ -14,7 +14,7 @@
       (config.nvim-lib.neovimPlugins.r.overrideAttrs (old: {
         postInstall = (old.postInstall or "") + ''
           mkdir -p $out/rnvimserver
-          cp ${pkgs.nvimcom}/bin/rnvimserver $out/rnvimserver/rnvimserver
+          cp ${pkgs.rnvimserver}/bin/rnvimserver $out/rnvimserver/rnvimserver
           chmod +x $out/rnvimserver/rnvimserver
         '';
       }))

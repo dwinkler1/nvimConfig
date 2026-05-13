@@ -22,11 +22,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1777954456,
-        "narHash": "sha256-hGdgeU2Nk87RAuZyYjyDjFL6LK7dAZN5RE9+hrDTkDU=",
+        "lastModified": 1778443072,
+        "narHash": "sha256-zi7/fsqM/kFdNuED//4WOCUtezGtKKqRNORjMvfwjnA=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
+        "rev": "da5ad661ba4e5ef59ba743f0d112cbc30e474f32",
         "type": "github"
       },
       "original": {
@@ -69,6 +69,29 @@
         "type": "github"
       }
     },
+    "r-nvim-nix": {
+      "inputs": {
+        "nixpkgs": [
+          "rixpkgs"
+        ],
+        "rnvimsrc": [
+          "plugins-r"
+        ]
+      },
+      "locked": {
+        "lastModified": 1778638679,
+        "narHash": "sha256-+mdjgYfyNtI/5E6X8uUx3u9qpGC9POS4LagOHSM3Iy0=",
+        "owner": "dwinkler1",
+        "repo": "r_nvim_nix",
+        "rev": "eb784558e18b8f1dead5bd211b96fd287ac1bed7",
+        "type": "github"
+      },
+      "original": {
+        "owner": "dwinkler1",
+        "repo": "r_nvim_nix",
+        "type": "github"
+      }
+    },
     "rixpkgs": {
       "locked": {
         "lastModified": 1771303851,
@@ -80,8 +103,8 @@
       },
       "original": {
         "owner": "dwinkler1",
-        "ref": "nixpkgs",
         "repo": "rixpkgs",
+        "rev": "af2dd3f7b4b172077747c0869d4e30702fb71b0e",
         "type": "github"
       }
     },
@@ -91,6 +114,7 @@
         "nixpkgs": "nixpkgs",
         "plugins-cmp-pandoc-references": "plugins-cmp-pandoc-references",
         "plugins-r": "plugins-r",
+        "r-nvim-nix": "r-nvim-nix",
         "rixpkgs": "rixpkgs",
         "wrappers": "wrappers"
       }
@@ -102,11 +126,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1777991014,
-        "narHash": "sha256-0DS24OW9d9iz+w0LCz6KpS2IpE2z2gHxeBdMZg9xpDY=",
+        "lastModified": 1778560014,
+        "narHash": "sha256-Hu9RMo7vJt/4dx/vAvyG+cE9RBwpaH1ouyunvruYaDI=",
         "owner": "BirdeeHub",
         "repo": "nix-wrapper-modules",
-        "rev": "dc5184095ad488e937ec308b52c9c0b218959d8b",
+        "rev": "e30aa99c9c7038e16efae3cad7916a47307a9e36",
         "type": "github"
       },
       "original": {
