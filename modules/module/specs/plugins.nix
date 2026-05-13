@@ -11,13 +11,7 @@
 
   config.specs.r = {
     data = with pkgs.vimPlugins; [
-      (config.nvim-lib.neovimPlugins.r.overrideAttrs (old: {
-        postInstall = (old.postInstall or "") + ''
-          mkdir -p $out/rnvimserver
-          cp ${pkgs.rnvimserver}/bin/rnvimserver $out/rnvimserver/rnvimserver
-          chmod +x $out/rnvimserver/rnvimserver
-        '';
-      }))
+      pkgs.r-nvim
       quarto-nvim
       {
         data = otter-nvim;
