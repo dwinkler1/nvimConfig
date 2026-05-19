@@ -15,17 +15,17 @@ now_if_args(function()
     marksman = {
       filetypes = { "markdown", "markdown_inline", "codecompanion" },
     },
-    r_language_server = {
-      filetypes = { 'r', 'rmd', 'rmarkdown' },
-      settings = {
-        ['r_language_server'] = {
-          lsp = {
-            rich_documentation = true,
-            enable = true,
-          },
-        },
-      }
-    },
+    -- r_language_server = {
+    --   filetypes = { 'r', 'rmd', 'rmarkdown' },
+    --   settings = {
+    --     ['r_language_server'] = {
+    --       lsp = {
+    --         rich_documentation = true,
+    --         enable = true,
+    --       },
+    --     },
+    --   }
+    -- },
     julials = {
       settings = {
         julia = {
