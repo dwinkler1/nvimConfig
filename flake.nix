@@ -105,7 +105,7 @@
     forAllSystems = nixpkgs.lib.genAttrs systems;
 
     extra_pkg_config = {
-      # allowUnfree = true;
+       allowUnfree = true;
     };
 
     overlayDefs = import ./overlays inputs;

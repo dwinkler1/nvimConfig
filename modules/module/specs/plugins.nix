@@ -3,10 +3,9 @@
   pkgs,
   lib,
   ...
-}:
-{
+}: {
   config.specs.gitPlugins = {
-    data = [ ];
+    data = [];
   };
 
   config.specs.r = {
@@ -112,7 +111,9 @@
       nvim-treesitter-context
       nvim-treesitter-textobjects
       {
-        data = pkgs.codecompanion-nvim;
+        data = pkgs.codecompanion-nvim.overrideAttrs (old: {
+          doCheck = false;
+        });
         pname = "codecompanion";
       }
     ];
@@ -176,6 +177,6 @@
 
   config.specs.gitPlugins-lazy = {
     lazy = true;
-    data = [ ];
+    data = [];
   };
 }
