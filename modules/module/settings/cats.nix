@@ -14,7 +14,6 @@
 
       Available categories:
       - clickhouse: Clickhouse client and tools
-      - customPlugins: local plugin specs
       - external: external tools and integrations
       - general: core Neovim plugins/features
       - gitPlugins: git-related plugins
@@ -25,7 +24,6 @@
       - optional: optional tools and utilities
       - python: Python tooling and plugins
       - r: R tooling and plugins
-      - test: test-only tooling (disabled by default)
       - treesitterParsers: Treesitter parsers
       - utils: general utilities
     '';
@@ -33,18 +31,16 @@
 
   config.cats = {
     clickhouse = lib.mkDefault false;
-    customPlugins = lib.mkDefault true;
     external = lib.mkDefault true;
     general = lib.mkDefault true;
     gitPlugins = lib.mkDefault true;
     julia = lib.mkDefault false;
     lua = lib.mkDefault true;
-    markdown = lib.mkDefault false;
+    markdown = lib.mkDefault true;
     nix = lib.mkDefault true;
     optional = lib.mkDefault false;
     python = lib.mkDefault false;
     r = lib.mkDefault true;
-    test = lib.mkDefault false;
     treesitterParsers = lib.mkDefault true;
     utils = lib.mkDefault true;
   };

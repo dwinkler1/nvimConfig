@@ -26,7 +26,7 @@
     };
     default = { };
     description = ''
-      Language-specific package overrides appended to each language spec's extraPackages.
+      Language-specific package overrides appended to each language spec's runtimePackages.
       Intended for flake.nix overrides via wrapper.config.wrap.
     '';
   };

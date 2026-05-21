@@ -4,11 +4,11 @@
   lib,
   ...
 }: {
-  config.specs.gitPlugins = {
+  config.specs.gitPlugins = lib.mkIf (config.cats.gitPlugins or true) {
     data = [];
   };
 
-  config.specs.r = {
+  config.specs.r = lib.mkIf (config.cats.r or true) {
     data = with pkgs.vimPlugins; [
       pkgs.r-nvim
       quarto-nvim
@@ -19,14 +19,14 @@
     ];
   };
 
-  config.specs.markdown-lazy = {
+  config.specs.markdown-lazy = lib.mkIf (config.cats.markdown or true) {
     lazy = true;
     data = [
       config.nvim-lib.neovimPlugins.cmp-pandoc-references
     ];
   };
 
-  config.specs.general = {
+  config.specs.general = lib.mkIf (config.cats.general or true) {
     data = with pkgs.vimPlugins; [
       lze
       lzextras
@@ -79,7 +79,7 @@
     ];
   };
 
-  config.specs.lua = {
+  config.specs.lua = lib.mkIf (config.cats.lua or true) {
     data = with pkgs.vimPlugins; [
       luvit-meta
       {
@@ -89,7 +89,7 @@
     ];
   };
 
-  config.specs.markdown = {
+  config.specs.markdown = lib.mkIf (config.cats.markdown or true) {
     data = with pkgs.vimPlugins; [
       quarto-nvim
       render-markdown-nvim
@@ -104,7 +104,7 @@
     ];
   };
 
-  config.specs.utils = {
+  config.specs.utils = lib.mkIf (config.cats.utils or true) {
     data = with pkgs.vimPlugins; [
       blink-cmp
       nvim-lspconfig
@@ -119,7 +119,7 @@
     ];
   };
 
-  config.specs.treesitterParsers = {
+  config.specs.treesitterParsers = lib.mkIf (config.cats.treesitterParsers or true) {
     data = with pkgs.vimPlugins.nvim-treesitter-parsers; [
       bash
       c
@@ -158,7 +158,7 @@
     ];
   };
 
-  config.specs.utils-lazy = {
+  config.specs.utils-lazy = lib.mkIf (config.cats.utils or true) {
     lazy = true;
     data = with pkgs.vimPlugins; [
       blink-compat
@@ -175,7 +175,7 @@
     ];
   };
 
-  config.specs.gitPlugins-lazy = {
+  config.specs.gitPlugins-lazy = lib.mkIf (config.cats.gitPlugins or true) {
     lazy = true;
     data = [];
   };

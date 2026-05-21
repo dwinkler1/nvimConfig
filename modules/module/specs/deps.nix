@@ -5,23 +5,13 @@
   wlib,
   ...
 }: {
-  # ============================================================================
-  # SPEC MODULE DEFAULTS
-  # ============================================================================
-  # Define default options available to all specs
-
   config.specMods = {parentSpec ? null, ...}: {
-    options.extraPackages = lib.mkOption {
+    options.runtimePkgs = lib.mkOption {
       type = lib.types.listOf wlib.types.stringable;
       default = [];
-      description = "a extraPackages spec field to put packages to suffix to the PATH";
+      description = "a runtimePkgs spec field to put packages to suffix to the PATH";
     };
   };
-
-  # ============================================================================
-  # EXTERNAL TOOLS SPEC
-  # ============================================================================
-  # Core system tools and utilities
 
   config.specs.external = {
     data = lib.mkDefault null;
@@ -30,7 +20,7 @@
       vim.o.shell = "${pkgs.zsh}/bin/zsh"
     '';
     runtimeDeps = "prefix";
-    extraPackages = with pkgs; [
+    runtimePkgs = with pkgs; [
       perl
       ruby
       shfmt
@@ -39,15 +29,11 @@
     ];
   };
 
-  # ============================================================================
-  # OPTIONAL TOOLS SPEC
-  # ============================================================================
-
   config.specs.optional = lib.mkIf (config.cats.optional or true) {
     data = lib.mkDefault null;
     runtimeDeps = "prefix";
     before = ["INIT_MAIN"];
-    extraPackages = with pkgs; [
+    runtimePkgs = with pkgs; [
       bat
       broot
       devenv
@@ -76,54 +62,38 @@
     ];
   };
 
-  # ============================================================================
-  # MARKDOWN SPEC
-  # ============================================================================
-
   config.specs.markdown = lib.mkIf (config.cats.markdown or true) {
     data = lib.mkDefault null;
     runtimeDeps = "prefix";
-    extraPackages = with pkgs; [
+    runtimePkgs = with pkgs; [
       python313Packages.pylatexenc
       quarto
       zk
     ];
   };
 
-  # ============================================================================
-  # NIX SPEC
-  # ============================================================================
-
   config.specs.nix = lib.mkIf (config.cats.nix or true) {
     data = lib.mkDefault null;
     runtimeDeps = "prefix";
-    extraPackages = with pkgs; [
+    runtimePkgs = with pkgs; [
       alejandra
       nix-doc
       nixd
     ];
   };
 
-  # ============================================================================
-  # LUA SPEC
-  # ============================================================================
-
   config.specs.lua = lib.mkIf (config.cats.lua or true) {
     data = lib.mkDefault null;
     runtimeDeps = "prefix";
-    extraPackages = with pkgs; [
+    runtimePkgs = with pkgs; [
       lua-language-server
     ];
   };
 
-  # ============================================================================
-  # PYTHON SPEC
-  # ============================================================================
-
   config.specs.python = lib.mkIf (config.cats.python or true) {
     data = lib.mkDefault null;
     runtimeDeps = "prefix";
-    extraPackages = let
+    runtimePkgs = let
       python_packages_fn =
         if pkgs ? basePythonPackages
         then ps: pkgs.basePythonPackages ps ++ config.settings.lang_packages.python
@@ -139,14 +109,10 @@
       ];
   };
 
-  # ============================================================================
-  # R SPEC
-  # ============================================================================
-
   config.specs.r = lib.mkIf (config.cats.r or true) {
     data = lib.mkDefault null;
     runtimeDeps = "prefix";
-    extraPackages = let
+    runtimePkgs = let
       r_packages = (pkgs.baseRPackages or []) ++ config.settings.lang_packages.r;
     in
       with pkgs; [
@@ -159,30 +125,22 @@
       ];
   };
 
-  # ============================================================================
-  # JULIA SPEC
-  # ============================================================================
-
   config.specs.julia = lib.mkIf (config.cats.julia or true) {
     data = lib.mkDefault null;
     runtimeDeps = "prefix";
-    extraPackages = let
+    runtimePkgs = let
       julia_with_packages =
         pkgs.julia-bin.withPackages config.settings.lang_packages.julia;
     in [julia_with_packages];
   };
 
-  # ============================================================================
-  # CLICKHOUSE SPEC
-  # ============================================================================
-
   config.specs.clickhouse = lib.mkIf (config.cats.clickhouse or true) {
     data = lib.mkDefault null;
     runtimeDeps = "prefix";
-    extraPackages = with pkgs; [
+    runtimePkgs = with pkgs; [
       clickhouse-lts
     ];
   };
 
-  config.extraPackages = config.specCollect (acc: v: acc ++ (v.extraPackages or [])) [];
+  config.runtimePkgs = config.specCollect (acc: v: acc ++ (v.runtimePkgs or [])) [];
 }

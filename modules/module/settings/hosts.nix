@@ -15,7 +15,7 @@
         nvim-host.enable = true;
         nvim-host.package = "${pkgs.neovide}/bin/neovide";
         nvim-host.argv0 = "neovide";
-        nvim-host.flags."--neovim-bin" = "${placeholder "out"}/bin/${config.binName}";
+        nvim-host.flags."--neovim-bin" = "${builtins.placeholder "out"}/bin/${config.binName}";
       };
 
       m = {

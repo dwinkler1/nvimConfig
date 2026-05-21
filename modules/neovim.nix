@@ -7,16 +7,10 @@ inputs:
   ...
 }:
 {
-  # ============================================================================
-  # IMPORTS
-  # ============================================================================
-  # Import the base neovim wrapper module and all configuration modules
-
   imports = [
     wlib.wrapperModules.neovim
     ./module/specs/deps.nix
     ./module/specs/plugins.nix
-    ./module/specs/cats-enable.nix
     ./module/settings/core.nix
     ./module/settings/cats.nix
     ./module/settings/env.nix
@@ -24,11 +18,6 @@ inputs:
     ./module/settings/lang-packages.nix
     ./module/settings/runtime-path.nix
   ];
-
-  # ============================================================================
-  # HELPER FUNCTIONS
-  # ============================================================================
-  # Utilities for working with plugin inputs
 
   options.nvim-lib.neovimPlugins = lib.mkOption {
     readOnly = true;
@@ -57,11 +46,6 @@ inputs:
         builtins.listToAttrs
       ];
   };
-
-  # ============================================================================
-  # CONFIGURATION
-  # ============================================================================
-  # Pass cats configuration to neovim and expose metadata
 
   config.settings.cats = config.cats;
   config.info.cats = config.cats;

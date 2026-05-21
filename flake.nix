@@ -1,11 +1,10 @@
-# Copyright (c) 2026 BirdeeHub
+# Copyright (c) 2026 Daniel
 # Licensed under the MIT license
 {
   description = "Daniel's NixCats";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    #nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
     wrappers = {
       url = "github:BirdeeHub/nix-wrapper-modules";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -40,13 +39,15 @@
     wrappers,
     ...
   } @ inputs: let
-    mkWrapperConfig = pkgs: {
-      cats = {
+    mkWrapperConfig = pkgs: let
+      def = pkgs.lib.mkDefault;
+    in {
+      cats = pkgs.lib.mapAttrs (_: v: def v) {
         clickhouse = false;
         gitPlugins = true;
         julia = false;
         lua = true;
-        markdown = false;
+        markdown = true;
         nix = true;
         optional = false;
         python = false;
@@ -54,46 +55,30 @@
       };
       settings = {
         lang_packages = {
-          python = with pkgs.python3Packages; [
+          python = def (with pkgs.python3Packages; [
             duckdb
             polars
-          ];
-          r = with pkgs.rpkgs.rPackages; [
+          ]);
+          r = def ((with pkgs.rpkgs.rPackages; [
             arrow
             broom
             data_table
             janitor
             languageserver
             styler
-            pkgs.nvimcom
-          ];
-          julia = ["DataFramesMeta" "QuackIO"];
+          ]) ++ [ pkgs.nvimcom ]);
+          julia = def ["DataFramesMeta" "QuackIO"];
         };
-        colorscheme = "cyberdream";
-        background = "dark";
-        wrapRc = true;
       };
-      binName = "vv";
+      binName = def "vv";
     };
 
     wrapperSettings = pkgs: let
       cfg = mkWrapperConfig pkgs;
-      def = pkgs.lib.mkDefault;
     in
       wrapper.config.wrap {
         inherit pkgs;
-        cats = pkgs.lib.mapAttrs (_: v: def v) cfg.cats;
-        settings = {
-          lang_packages = {
-            python = def cfg.settings.lang_packages.python;
-            r = def cfg.settings.lang_packages.r;
-            julia = def cfg.settings.lang_packages.julia;
-          };
-          colorscheme = def cfg.settings.colorscheme;
-          background = def cfg.settings.background;
-          wrapRc = def cfg.settings.wrapRc;
-        };
-        binName = def cfg.binName;
+        inherit (cfg) cats settings binName;
       };
 
     systems = [
@@ -104,54 +89,39 @@
 
     forAllSystems = nixpkgs.lib.genAttrs systems;
 
-    extra_pkg_config = {
-       allowUnfree = true;
-    };
-
     overlayDefs = import ./overlays inputs;
-
-    dependencyOverlays = overlayDefs.dependencyOverlays;
-
-    dependencyOverlay = overlayDefs.dependencyOverlay;
 
     mkPkgs = system:
       import nixpkgs {
         inherit system;
-        config = extra_pkg_config;
-        overlays = [dependencyOverlay];
+        config = { allowUnfree = true; };
+        overlays = [ overlayDefs.dependencyOverlay ];
       };
 
-    module = nixpkgs.lib.modules.importApply ./modules/neovim.nix inputs;
+    module = (import ./modules/neovim.nix) inputs;
     wrapper = wrappers.lib.evalModule module;
   in {
     overlays = {
+      # overlay `vv` wraps the module with default settings only.
+      # For the fully-configured binary (including mkWrapperConfig overrides),
+      # use `packages.<system>.default` instead.
       default = nixpkgs.lib.composeManyExtensions [
-        dependencyOverlay
+        overlayDefs.dependencyOverlay
         (final: prev: {
           vv = wrapper.config.wrap {pkgs = final;};
         })
       ];
-      dependencies = dependencyOverlay;
-      vv = self.overlays.default;
+      dependencies = overlayDefs.dependencyOverlay;
     };
 
-    wrapperModules = {
-      default = module;
-      neovim = self.wrapperModules.default;
-    };
-
-    wrappers = {
-      default = wrapper.config;
-      neovim = self.wrappers.default;
-    };
+    wrapperModules.default = module;
+    wrapperConfigs.default = wrapper.config;
 
     packages = forAllSystems (
       system: let
         pkgs = mkPkgs system;
-        nvimPkg = wrapperSettings pkgs;
       in {
-        default = nvimPkg;
-        vv = nvimPkg;
+        default = wrapperSettings pkgs;
       }
     );
 
@@ -208,16 +178,15 @@
 
         shellPackages =
           [nvimPkg]
-          ++ pkgs.lib.optionals cfg.cats.python pythonPackages
-          ++ pkgs.lib.optionals cfg.cats.r rPackages
-          ++ pkgs.lib.optionals cfg.cats.julia juliaPackages
-          ++ pkgs.lib.optionals cfg.cats.markdown markdownPackages;
+          ++ pkgs.lib.optionals wrapper.config.cats.python pythonPackages
+          ++ pkgs.lib.optionals wrapper.config.cats.r rPackages
+          ++ pkgs.lib.optionals wrapper.config.cats.julia juliaPackages
+          ++ pkgs.lib.optionals wrapper.config.cats.markdown markdownPackages;
       in {
         default = pkgs.mkShell {
           name = "vShell";
           packages = shellPackages;
-          nativeBuildInputs = with pkgs; [] ++ (pkgs.lib.optionals cfg.cats.optional [devenv]);
-          inputsFrom = [];
+          nativeBuildInputs = pkgs.lib.optionals wrapper.config.cats.optional [ pkgs.devenv ];
           shellHook = ''
             echo 'I am a NixShell'
             export R_HOME=$(R RHOME)
@@ -234,18 +203,11 @@
         pkgs = mkPkgs system;
         nvimPkg = wrapperSettings pkgs;
       in {
-        default = nvimPkg;
-        module-eval = let
-          _ = wrapper.config;
-        in
-          pkgs.runCommand "check-module-eval" {} ''
-            echo "Module evaluation successful" > $out
-          '';
-        package-build = pkgs.runCommand "check-vv" {} ''
+        default = pkgs.runCommand "check-vv" {} ''
           BINARY_PATH="${nvimPkg}/bin/vv"
 
           if [ ! -x "$BINARY_PATH" ]; then
-            echo "Error: Binary n not found or not executable"
+            echo "Error: Binary not found or not executable"
             exit 1
           fi
 
@@ -258,6 +220,11 @@
             cat version_output.txt >> $out
           fi
         '';
+        module-eval =
+          let _ = wrapper.config;
+          in pkgs.runCommand "check-module-eval" {} ''
+            echo "Module evaluation successful" > $out
+          '';
       }
     );
 
