@@ -71,22 +71,24 @@ end)
 now(function()
   vim.treesitter.language.register("markdown", { "quarto", "rmd" })
 
-  vim.api.nvim_create_autocmd("FileType", {
-    pattern = { "quarto" },
-    callback = function()
-      require("otter").activate()
-    end,
-  })
+  if nix.get_cat({"r", "markdown"}, false) then
+    vim.api.nvim_create_autocmd("FileType", {
+      pattern = { "quarto" },
+      callback = function()
+        require("otter").activate()
+      end,
+    })
 
-  require("otter").setup({
-    lsp = {
-      diagnostic_update_events = { "BufWritePost", "InsertLeave" },
-    },
-    buffers = {
-      set_filetype = true,
-      write_to_disk = true,
-    },
-  })
+    require("otter").setup({
+      lsp = {
+        diagnostic_update_events = { "BufWritePost", "InsertLeave" },
+      },
+      buffers = {
+        set_filetype = true,
+        write_to_disk = true,
+      },
+    })
+  end
 end)
 
 later(function()

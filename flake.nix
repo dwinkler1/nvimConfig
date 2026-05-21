@@ -39,10 +39,8 @@
     wrappers,
     ...
   } @ inputs: let
-    mkWrapperConfig = pkgs: let
-      def = pkgs.lib.mkDefault;
-    in {
-      cats = pkgs.lib.mapAttrs (_: v: def v) {
+    mkWrapperConfig = pkgs: {
+      cats = {
         clickhouse = false;
         gitPlugins = true;
         julia = false;
@@ -55,22 +53,12 @@
       };
       settings = {
         lang_packages = {
-          python = def (with pkgs.python3Packages; [
-            duckdb
-            polars
-          ]);
-          r = def ((with pkgs.rpkgs.rPackages; [
-            arrow
-            broom
-            data_table
-            janitor
-            languageserver
-            styler
-          ]) ++ [ pkgs.nvimcom ]);
-          julia = def ["DataFramesMeta" "QuackIO"];
+          python = [];
+          r = [];
+          julia = [];
         };
       };
-      binName = def "vv";
+      binName = "vv";
     };
 
     wrapperSettings = pkgs: let
@@ -78,7 +66,7 @@
     in
       wrapper.config.wrap {
         inherit pkgs;
-        inherit (cfg) cats settings binName;
+        inherit (cfg) settings binName;
       };
 
     systems = [
@@ -135,14 +123,29 @@
     devShells = forAllSystems (
       system: let
         pkgs = mkPkgs system;
-        cfg = mkWrapperConfig pkgs;
         nvimPkg = wrapperSettings pkgs;
+
+        pythonPkgs = with pkgs.python3Packages; [
+          duckdb
+          polars
+        ];
+
+        rPkgs = (with pkgs.rpkgs.rPackages; [
+          arrow
+          broom
+          data_table
+          janitor
+          languageserver
+          styler
+        ]) ++ [ pkgs.nvimcom ];
+
+        juliaPkgs = ["DataFramesMeta" "QuackIO"];
 
         pythonPackages = let
           python_packages_fn =
             if pkgs ? basePythonPackages
-            then ps: pkgs.basePythonPackages ps ++ cfg.settings.lang_packages.python
-            else _: cfg.settings.lang_packages.python;
+            then ps: pkgs.basePythonPackages ps ++ pythonPkgs
+            else _: pythonPkgs;
         in
           with pkgs; [
             (python3.withPackages python_packages_fn)
@@ -153,7 +156,7 @@
           ];
 
         rPackages = let
-          r_packages = (pkgs.baseRPackages or []) ++ cfg.settings.lang_packages.r;
+          r_packages = (pkgs.baseRPackages or []) ++ rPkgs;
         in
           with pkgs; [
             (rWrapper.override {packages = r_packages;})
@@ -167,7 +170,7 @@
           ];
 
         juliaPackages = let
-          julia_with_packages = pkgs.julia-bin.withPackages cfg.settings.lang_packages.julia;
+          julia_with_packages = pkgs.julia-bin.withPackages juliaPkgs;
         in [julia_with_packages];
 
         markdownPackages = with pkgs; [
