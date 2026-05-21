@@ -71,7 +71,7 @@ end)
 now(function()
   vim.treesitter.language.register("markdown", { "quarto", "rmd" })
 
-  if nix.get_cat({"r", "markdown"}, false) then
+  if nix.get_cat({ "r", "markdown" }, false) then
     vim.api.nvim_create_autocmd("FileType", {
       pattern = { "quarto" },
       callback = function()
@@ -92,22 +92,24 @@ now(function()
 end)
 
 later(function()
-  require("quarto").setup({
-    lspFeatures = {
-      enabled = true,
-      chunks = "curly",
-      languages = { "r", "python", "julia" },
-      diagnostics = {
+  if nix.get_cat({ "r", "markdown" }, false) then
+    require("quarto").setup({
+      lspFeatures = {
         enabled = true,
-        triggers = { "BufWritePost" },
+        chunks = "curly",
+        languages = { "r", "python", "julia" },
+        diagnostics = {
+          enabled = true,
+          triggers = { "BufWritePost" },
+        },
+        completion = {
+          enabled = true,
+        },
       },
-      completion = {
+      codeRunner = {
         enabled = true,
+        default_method = "slime",
       },
-    },
-    codeRunner = {
-      enabled = true,
-      default_method = "slime",
-    },
-  })
+    })
+  end
 end)
