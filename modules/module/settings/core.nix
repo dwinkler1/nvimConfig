@@ -32,4 +32,10 @@
 
   # Enable wrapper handling of spec runtimeDeps (template pattern).
   config.settings.autowrapRuntimeDeps = true;
+
+  # The wrapper library currently emits runtime PATH additions via `suffixVar`,
+  # which lets host-level tools in `/usr/local/bin` win inside `nix run`.
+  # Mirror those additions into `prefixVar` so wrapped Neovim resolves the
+  # Nix-provided toolchain first while preserving existing wrapper behavior.
+  config.prefixVar = lib.mkAfter config.suffixVar;
 }
