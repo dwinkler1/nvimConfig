@@ -13,133 +13,69 @@
     };
   };
 
-  config.specs.external = {
+  config.specs.always = lib.mkIf (config.cats.always or true) {
+    data = lib.mkDefault null;
+    runtimeDeps = "prefix";
+    runtimePkgs = config.catPkgs.always;
+  };
+
+  config.specs.external = lib.mkIf (config.cats.external or true) {
     data = lib.mkDefault null;
     before = ["INIT_MAIN"];
     config = ''
       vim.o.shell = "${pkgs.zsh}/bin/zsh"
     '';
     runtimeDeps = "prefix";
-    runtimePkgs = with pkgs; [
-      perl
-      ruby
-      shfmt
-      sqlfluff
-      tree-sitter
-    ];
+    runtimePkgs = config.catPkgs.external;
   };
 
   config.specs.optional = lib.mkIf (config.cats.optional or true) {
     data = lib.mkDefault null;
     runtimeDeps = "prefix";
     before = ["INIT_MAIN"];
-    runtimePkgs = with pkgs; [
-      bat
-      broot
-      devenv
-      dust
-      fd
-      fzf
-      gawk
-      gh
-      git
-      hunspell
-      hunspellDicts.de-at
-      hunspellDicts.en-us
-      ispell
-      jq
-      just
-      lazygit
-      man
-      ncdu
-      pigz
-      poppler
-      ripgrep
-      tokei
-      wget
-      yq
-      zathura
-    ];
+    runtimePkgs = config.catPkgs.optional;
   };
 
   config.specs.markdown = lib.mkIf (config.cats.markdown or true) {
     data = lib.mkDefault null;
     runtimeDeps = "prefix";
-    runtimePkgs = with pkgs; [
-      python313Packages.pylatexenc
-      quarto
-      zk
-    ];
+    runtimePkgs = config.catPkgs.markdown;
   };
 
   config.specs.nix = lib.mkIf (config.cats.nix or true) {
     data = lib.mkDefault null;
     runtimeDeps = "prefix";
-    runtimePkgs = with pkgs; [
-      alejandra
-      nix-doc
-      nixd
-    ];
+    runtimePkgs = config.catPkgs.nix;
   };
 
   config.specs.lua = lib.mkIf (config.cats.lua or true) {
     data = lib.mkDefault null;
     runtimeDeps = "prefix";
-    runtimePkgs = with pkgs; [
-      lua-language-server
-    ];
+    runtimePkgs = config.catPkgs.lua;
   };
 
   config.specs.python = lib.mkIf (config.cats.python or true) {
     data = lib.mkDefault null;
     runtimeDeps = "prefix";
-    runtimePkgs = let
-      python_packages_fn =
-        if pkgs ? basePythonPackages
-        then ps: pkgs.basePythonPackages ps ++ config.settings.lang_packages.python
-        else _: config.settings.lang_packages.python;
-      python_with_packages = pkgs.python3.withPackages python_packages_fn;
-    in
-      with pkgs; [
-        python_with_packages
-        nodejs
-        ruff
-        basedpyright
-        uv
-      ];
+    runtimePkgs = config.catPkgs.python;
   };
 
   config.specs.r = lib.mkIf (config.cats.r or true) {
     data = lib.mkDefault null;
     runtimeDeps = "prefix";
-    runtimePkgs = let
-      r_packages = (pkgs.baseRPackages or []) ++ config.settings.lang_packages.r;
-    in
-      with pkgs; [
-        (rWrapper.override {packages = r_packages;})
-        radianWrapper
-        (quarto.override {extraRPackages = r_packages;})
-        air-formatter
-        yaml-language-server
-        updateR
-      ];
+    runtimePkgs = config.catPkgs.r;
   };
 
   config.specs.julia = lib.mkIf (config.cats.julia or true) {
     data = lib.mkDefault null;
     runtimeDeps = "prefix";
-    runtimePkgs = let
-      julia_with_packages =
-        pkgs.julia-bin.withPackages config.settings.lang_packages.julia;
-    in [julia_with_packages];
+    runtimePkgs = config.catPkgs.julia;
   };
 
   config.specs.clickhouse = lib.mkIf (config.cats.clickhouse or true) {
     data = lib.mkDefault null;
     runtimeDeps = "prefix";
-    runtimePkgs = with pkgs; [
-      clickhouse-lts
-    ];
+    runtimePkgs = config.catPkgs.clickhouse;
   };
 
   config.runtimePkgs = config.specCollect (acc: v: acc ++ (v.runtimePkgs or [])) [];

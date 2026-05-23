@@ -9,6 +9,7 @@ inputs:
 {
   imports = [
     wlib.wrapperModules.neovim
+    ./module/settings/cat-packages.nix
     ./module/specs/deps.nix
     ./module/specs/plugins.nix
     ./module/settings/core.nix
@@ -16,7 +17,6 @@ inputs:
     ./module/settings/env.nix
     ./module/settings/hosts.nix
     ./module/settings/lang-packages.nix
-    ./module/settings/runtime-path.nix
   ];
 
   options.nvim-lib.neovimPlugins = lib.mkOption {

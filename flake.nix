@@ -11,9 +11,12 @@
     };
     rixpkgs.url = "github:dwinkler1/rixpkgs/af2dd3f7b4b172077747c0869d4e30702fb71b0e";
 
-    r-nvim-nix.url = "github:dwinkler1/r_nvim_nix";
-    r-nvim-nix.inputs.rnvimsrc.follows = "plugins-r";
-    r-nvim-nix.inputs.nixpkgs.follows = "rixpkgs";
+    r-nvim-nix = {
+      url = "github:dwinkler1/r_nvim_nix/v0.99.4";
+      inputs = {
+        nixpkgs.follows = "rixpkgs";
+      };
+    };
 
     fran = {
       url = "github:dwinkler1/fran";
@@ -44,14 +47,15 @@
         duckdb
         polars
       ];
-      r = (with pkgs.rpkgs.rPackages; [
-        arrow
-        broom
-        data_table
-        janitor
-        styler
-        pkgs.nvimcom
-      ]) ++ [ pkgs.nvimcom ];
+      r =
+        (with pkgs.rpkgs.rPackages; [
+          arrow
+          broom
+          data_table
+          janitor
+          styler
+        ])
+        ++ [pkgs.nvimcom];
       julia = [
         "DataFramesMeta"
         "QuackIO"
@@ -59,17 +63,6 @@
     };
 
     mkWrapperConfig = pkgs: {
-      cats = {
-        clickhouse = false;
-        gitPlugins = true;
-        julia = false;
-        lua = true;
-        markdown = true;
-        nix = true;
-        optional = false;
-        python = false;
-        r = true;
-      };
       settings = {
         lang_packages = langPackages pkgs;
       };
@@ -97,8 +90,12 @@
     mkPkgs = system:
       import nixpkgs {
         inherit system;
-        config = { allowUnfree = true; };
-        overlays = [ overlayDefs.dependencyOverlay ];
+        config = {allowUnfree = true;};
+        overlays = [
+          overlayDefs.dependencyOverlay
+          inputs.r-nvim-nix.overlays.default
+          inputs.fran.overlays.default
+        ];
       };
 
     module = (import ./modules/neovim.nix) inputs;
@@ -140,56 +137,21 @@
         pkgs = mkPkgs system;
         nvimPkg = wrapperSettings pkgs;
 
-        langPkgs = langPackages pkgs;
-
-        pythonPackages = let
-          python_packages_fn =
-            if pkgs ? basePythonPackages
-            then ps: pkgs.basePythonPackages ps ++ langPkgs.python
-            else _: langPkgs.python;
-        in
-          with pkgs; [
-            (python3.withPackages python_packages_fn)
-            nodejs
-            ruff
-            basedpyright
-            uv
-          ];
-
-        rPackages = let
-          r_packages = (pkgs.baseRPackages or []) ++ langPkgs.r;
-        in
-          with pkgs; [
-            (rWrapper.override {packages = r_packages;})
-            radianWrapper
-            (quarto.override {extraRPackages = r_packages;})
-            air-formatter
-            yaml-language-server
-            nvimcom
-            rnvimserver
-          ];
-
-        juliaPackages = let
-          julia_with_packages = pkgs.julia-bin.withPackages langPkgs.julia;
-        in [julia_with_packages];
-
-        markdownPackages = with pkgs; [
-          python313Packages.pylatexenc
-          quarto
-          zk
-        ];
-
-        shellPackages =
-          [nvimPkg]
-          ++ pkgs.lib.optionals wrapper.config.cats.python pythonPackages
-          ++ pkgs.lib.optionals wrapper.config.cats.r rPackages
-          ++ pkgs.lib.optionals wrapper.config.cats.julia juliaPackages
-          ++ pkgs.lib.optionals wrapper.config.cats.markdown markdownPackages;
+        shellPackages = [nvimPkg]
+          ++ wrapper.config.catPkgs.always or []
+          ++ wrapper.config.catPkgs.python or []
+          ++ wrapper.config.catPkgs.r or []
+          ++ wrapper.config.catPkgs.julia or []
+          ++ wrapper.config.catPkgs.markdown or []
+          ++ wrapper.config.catPkgs.optional or []
+          ++ wrapper.config.catPkgs.external or []
+          ++ wrapper.config.catPkgs.nix or []
+          ++ wrapper.config.catPkgs.lua or []
+          ++ wrapper.config.catPkgs.clickhouse or [];
       in {
         default = pkgs.mkShell {
           name = "vShell";
           packages = shellPackages;
-          nativeBuildInputs = pkgs.lib.optionals wrapper.config.cats.optional [ pkgs.devenv ];
           shellHook = ''
             echo 'I am a NixShell'
             export R_HOME=$(R RHOME)
@@ -223,9 +185,10 @@
             cat version_output.txt >> $out
           fi
         '';
-        module-eval =
-          let _ = wrapper.config;
-          in pkgs.runCommand "check-module-eval" {} ''
+        module-eval = let
+          _ = wrapper.config;
+        in
+          pkgs.runCommand "check-module-eval" {} ''
             echo "Module evaluation successful" > $out
           '';
       }

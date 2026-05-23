@@ -13,6 +13,7 @@
       Set a category to `false` to skip its dependency/plugin specs.
 
       Available categories:
+      - always: always-on packages (not gated by a toggle)
       - clickhouse: Clickhouse client and tools
       - external: external tools and integrations
       - general: core Neovim plugins/features
@@ -30,6 +31,7 @@
   };
 
   config.cats = {
+    always = lib.mkDefault true;
     clickhouse = lib.mkDefault false;
     external = lib.mkDefault true;
     general = lib.mkDefault true;

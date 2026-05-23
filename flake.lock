@@ -74,20 +74,19 @@
         "nixpkgs": [
           "rixpkgs"
         ],
-        "rnvimsrc": [
-          "plugins-r"
-        ]
+        "rnvimsrc": "rnvimsrc"
       },
       "locked": {
-        "lastModified": 1778684156,
-        "narHash": "sha256-Z4y1tQfkIsPK4NRxGn668HMDfWxnxNxSJ0CAOOXiIfY=",
+        "lastModified": 1779438909,
+        "narHash": "sha256-1lvv0bdvSVyeCIgeZ7Ws7ffbDFurA5LJscS9dRLHzC8=",
         "owner": "dwinkler1",
         "repo": "r_nvim_nix",
-        "rev": "2f49dfee27886068e2f49cbd54558ce4cc424c82",
+        "rev": "ec17e22ab362a0ddfd6c2e9c5e95d43897a143be",
         "type": "github"
       },
       "original": {
         "owner": "dwinkler1",
+        "ref": "v0.99.4",
         "repo": "r_nvim_nix",
         "type": "github"
       }
@@ -105,6 +104,23 @@
         "owner": "dwinkler1",
         "repo": "rixpkgs",
         "rev": "af2dd3f7b4b172077747c0869d4e30702fb71b0e",
+        "type": "github"
+      }
+    },
+    "rnvimsrc": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1776905071,
+        "narHash": "sha256-dXox6qEs1VDE7vPNDoN8bY4g06uj1IEs6uki72w8lpA=",
+        "owner": "R-nvim",
+        "repo": "R.nvim",
+        "rev": "582f2af11290ac067e49018db38e12a511325556",
+        "type": "github"
+      },
+      "original": {
+        "owner": "R-nvim",
+        "ref": "v0.99.4",
+        "repo": "R.nvim",
         "type": "github"
       }
     },
