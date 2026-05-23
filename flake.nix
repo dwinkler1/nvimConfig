@@ -25,11 +25,6 @@
       };
     };
 
-    "plugins-r" = {
-      url = "github:R-nvim/R.nvim/v0.99.4";
-      flake = false;
-    };
-
     "plugins-cmp-pandoc-references" = {
       url = "github:jmbuhr/cmp-pandoc-references";
       flake = false;

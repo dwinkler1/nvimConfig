@@ -52,23 +52,6 @@
         "type": "github"
       }
     },
-    "plugins-r": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1776905071,
-        "narHash": "sha256-dXox6qEs1VDE7vPNDoN8bY4g06uj1IEs6uki72w8lpA=",
-        "owner": "R-nvim",
-        "repo": "R.nvim",
-        "rev": "582f2af11290ac067e49018db38e12a511325556",
-        "type": "github"
-      },
-      "original": {
-        "owner": "R-nvim",
-        "ref": "v0.99.4",
-        "repo": "R.nvim",
-        "type": "github"
-      }
-    },
     "r-nvim-nix": {
       "inputs": {
         "nixpkgs": [
@@ -129,7 +112,6 @@
         "fran": "fran",
         "nixpkgs": "nixpkgs",
         "plugins-cmp-pandoc-references": "plugins-cmp-pandoc-references",
-        "plugins-r": "plugins-r",
         "r-nvim-nix": "r-nvim-nix",
         "rixpkgs": "rixpkgs",
         "wrappers": "wrappers"

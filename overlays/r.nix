@@ -11,5 +11,4 @@ in {
   baseRPackages = [ ];
   rWrapper = rpkgs.rWrapper.override {packages = [ ];};
   quarto = rpkgs.quarto.override {extraRPackages = [ ];};
-  updateR = import ../scripts/updater.nix {pkgs = final;};
 }
