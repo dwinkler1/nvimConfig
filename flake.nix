@@ -1,4 +1,4 @@
-# Copyright (c) 2026 Daniel
+# Copyright (c) 2026 BirdeeHub & Daniel
 # Licensed under the MIT license
 {
   description = "Daniel's NixCats";
@@ -39,6 +39,25 @@
     wrappers,
     ...
   } @ inputs: let
+    langPackages = pkgs: {
+      python = with pkgs.python3Packages; [
+        duckdb
+        polars
+      ];
+      r = (with pkgs.rpkgs.rPackages; [
+        arrow
+        broom
+        data_table
+        janitor
+        styler
+        pkgs.nvimcom
+      ]) ++ [ pkgs.nvimcom ];
+      julia = [
+        "DataFramesMeta"
+        "QuackIO"
+      ];
+    };
+
     mkWrapperConfig = pkgs: {
       cats = {
         clickhouse = false;
@@ -52,11 +71,7 @@
         r = true;
       };
       settings = {
-        lang_packages = {
-          python = [];
-          r = [];
-          julia = [];
-        };
+        lang_packages = langPackages pkgs;
       };
       binName = "vv";
     };
@@ -125,27 +140,13 @@
         pkgs = mkPkgs system;
         nvimPkg = wrapperSettings pkgs;
 
-        pythonPkgs = with pkgs.python3Packages; [
-          duckdb
-          polars
-        ];
-
-        rPkgs = (with pkgs.rpkgs.rPackages; [
-          arrow
-          broom
-          data_table
-          janitor
-          languageserver
-          styler
-        ]) ++ [ pkgs.nvimcom ];
-
-        juliaPkgs = ["DataFramesMeta" "QuackIO"];
+        langPkgs = langPackages pkgs;
 
         pythonPackages = let
           python_packages_fn =
             if pkgs ? basePythonPackages
-            then ps: pkgs.basePythonPackages ps ++ pythonPkgs
-            else _: pythonPkgs;
+            then ps: pkgs.basePythonPackages ps ++ langPkgs.python
+            else _: langPkgs.python;
         in
           with pkgs; [
             (python3.withPackages python_packages_fn)
@@ -156,7 +157,7 @@
           ];
 
         rPackages = let
-          r_packages = (pkgs.baseRPackages or []) ++ rPkgs;
+          r_packages = (pkgs.baseRPackages or []) ++ langPkgs.r;
         in
           with pkgs; [
             (rWrapper.override {packages = r_packages;})
@@ -164,13 +165,12 @@
             (quarto.override {extraRPackages = r_packages;})
             air-formatter
             yaml-language-server
-            updateR
             nvimcom
             rnvimserver
           ];
 
         juliaPackages = let
-          julia_with_packages = pkgs.julia-bin.withPackages juliaPkgs;
+          julia_with_packages = pkgs.julia-bin.withPackages langPkgs.julia;
         in [julia_with_packages];
 
         markdownPackages = with pkgs; [

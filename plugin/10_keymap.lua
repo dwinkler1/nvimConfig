@@ -37,7 +37,7 @@ _G.Config.leader_group_clues = {
   { mode = 'x', keys = '<Leader>l',  desc = '+LSP' },
   { mode = 'x', keys = '<Leader>r',  desc = '+R' },
   { mode = 'n', keys = '<Leader>z',  desc = '+ZK' },
-  { mode = 'n', keys = '<Leader>zr',  desc = '+Reviews' },
+  { mode = 'n', keys = '<Leader>zr', desc = '+Reviews' },
   { mode = 'x', keys = '<leader>a',  desc = '+AI' },
 }
 
@@ -144,7 +144,7 @@ nmap_leader('gc', '<Cmd>Git commit<CR>', 'Commit')
 nmap_leader('gC', '<Cmd>Git commit --amend<CR>', 'Commit amend')
 nmap_leader('gd', '<Cmd>Git diff<CR>', 'Diff')
 nmap_leader('gD', '<Cmd>Git diff -- %<CR>', 'Diff buffer')
-nmap_leader('gg', '<Cmd>lua require("neogit").open()<CR>', 'Git tab')
+nmap_leader("gg", "<cmd>Neogit<cr>", "Open Neogit UI")
 nmap_leader('gl', '<Cmd>' .. git_log_cmd .. '<CR>', 'Log')
 nmap_leader('gL', '<Cmd>' .. git_log_cmd .. ' --follow -- %<CR>', 'Log buffer')
 nmap_leader('go', '<Cmd>lua MiniDiff.toggle_overlay()<CR>', 'Toggle overlay')
