@@ -55,6 +55,7 @@ Modular Neovim wrapper config. Defines a wrapped `vv` binary with per-category p
     in {
       default = pkgs.mkShell {
         packages = [ nv ] ++ nvimConfig.lib.devShellPackages evalResult.config;
+        shellHook = nvimConfig.lib.shellHook evalResult.config;
       };
     });
   };
@@ -171,6 +172,7 @@ This example enables a few cats, adds runtime tools to the shared wrapper/devShe
 
     devShells.${system}.default = pkgs.mkShell {
       packages = [ nv ] ++ nvimConfig.lib.devShellPackages evalResult.config;
+      shellHook = nvimConfig.lib.shellHook evalResult.config;
     };
   };
 }
@@ -336,4 +338,4 @@ cats.nix ───────────────► config.cats        │
 - **cat-packages.nix** is the single source of truth for per-category packages. Each list is gated by its cat toggle.
 - **deps.nix** wires `catPkgs` into the wrapper's runtime PATH.
 - **settings.lang_packages** holds the shared defaults used by local outputs and downstream module consumers.
-- **flake.nix** exports `lib.eval`, `lib.mkWrapper`, and `lib.devShellPackages` as the canonical downstream helpers, and builds `packages.default` and `devShells.default` from the same module config.
+- **flake.nix** exports `lib.eval`, `lib.mkWrapper`, `lib.devShellPackages`, and `lib.shellHook` as the canonical downstream helpers, and builds `packages.default` and `devShells.default` from the same module config.

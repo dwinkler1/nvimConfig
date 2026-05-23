@@ -104,6 +104,7 @@
       eval = {pkgs, modules ? []}: evalWithPkgs pkgs modules;
       mkWrapper = {pkgs, modules ? []}: (evalWithPkgs pkgs modules).config.wrap {inherit pkgs;};
       devShellPackages = config: mkDevShellPackages config;
+      shellHook = config: mkShellHook config;
     };
 
     overlays = {
