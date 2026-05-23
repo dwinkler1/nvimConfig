@@ -45,7 +45,6 @@
         janitor
         styler
       ])
-      ++ [pkgs.nvimcom]
     );
     julia = lib.mkDefault [
       "DataFramesMeta"

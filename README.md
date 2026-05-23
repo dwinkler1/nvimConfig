@@ -201,7 +201,7 @@ projectSettings = {
 Add Python/R/Julia libraries that get appended to the module defaults. The built-in defaults are:
 
 - Python: `duckdb`, `polars`
-- R: `arrow`, `broom`, `data_table`, `janitor`, `styler`, `nvimcom`
+- R: `arrow`, `broom`, `data_table`, `janitor`, `styler`
 - Julia: `DataFramesMeta`, `QuackIO`
 
 ```nix

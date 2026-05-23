@@ -6,7 +6,7 @@
 }:
 let
   rPackages = (pkgs.baseRPackages or [ ]) ++ config.settings.lang_packages.r;
-  rWrapperPkg = pkgs.rpkgs.rWrapper.override { packages = rPackages; };
+  rWrapperPkg = pkgs.rpkgs.rWrapper.override { packages = rPackages ++ [pkgs.nvimcom]; };
 in
 {
   config.hosts = lib.mkMerge [
