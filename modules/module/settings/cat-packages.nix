@@ -8,7 +8,7 @@ let
   maybe = cat: pkgsList:
     lib.optionals (config.cats.${cat} or false) pkgsList;
   rPackages = (pkgs.baseRPackages or [ ]) ++ config.settings.lang_packages.r;
-  rWrapperPackages = rPackages ++ [pkgs.nvimcom];
+  rWrapperPackages = rPackages;
   quartoPkg =
     if config.cats.r or false
     then pkgs.rpkgs.quarto.override { extraRPackages = rPackages; }

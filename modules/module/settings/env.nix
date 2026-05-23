@@ -13,15 +13,10 @@
     })
     (lib.mkIf (config.cats.r or false) {
       RNVIM_COMPLDIR = "$PWD/.r-compl";
-      R_LIBS_USER = "$PWD/.r-libs";
       TMPDIR = "$PWD/.r-tmp";
     })
   ];
 
   # Environment variables with defaults (can be overridden by user)
-  config.envDefault = lib.mkMerge [
-    (lib.mkIf (config.cats.r or false) {
-      R_LIBS_USER = "$PWD/.r-libs";
-    })
-  ];
+  config.envDefault = lib.mkMerge [ ];
 }
