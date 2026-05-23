@@ -4,6 +4,10 @@
   lib,
   ...
 }:
+let
+  rPackages = (pkgs.baseRPackages or [ ]) ++ config.settings.lang_packages.r;
+  rWrapperPkg = pkgs.rpkgs.rWrapper.override { packages = rPackages; };
+in
 {
   config.hosts = lib.mkMerge [
     {
@@ -45,7 +49,7 @@
     (lib.mkIf (config.cats.r or false) {
       r = {
         nvim-host.enable = true;
-        nvim-host.package = "${pkgs.rWrapper}/bin/R";
+        nvim-host.package = "${rWrapperPkg}/bin/R";
         nvim-host.argv0 = "R";
         nvim-host.addFlag = [
           "--no-save"
