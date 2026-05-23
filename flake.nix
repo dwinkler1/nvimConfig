@@ -42,40 +42,42 @@
     wrappers,
     ...
   } @ inputs: let
-    langPackages = pkgs: {
-      python = with pkgs.python3Packages; [
-        duckdb
-        polars
-      ];
-      r =
-        (with pkgs.rpkgs.rPackages; [
-          arrow
-          broom
-          data_table
-          janitor
-          styler
-        ])
-        ++ [pkgs.nvimcom];
-      julia = [
-        "DataFramesMeta"
-        "QuackIO"
-      ];
-    };
-
-    mkWrapperConfig = pkgs: {
-      settings = {
-        lang_packages = langPackages pkgs;
+    devShellCatOrder = [
+      "always"
+      "clickhouse"
+      "external"
+      "julia"
+      "lua"
+      "markdown"
+      "nix"
+      "optional"
+      "python"
+      "r"
+      "treesitterParsers"
+    ];
+    evalWithPkgs = pkgs: extraModules:
+      wrappers.lib.evalModules {
+        specialArgs = {
+          inherit pkgs;
+        };
+        modules =
+          [
+            module
+          ]
+          ++ extraModules;
       };
-      binName = "vv";
-    };
-
-    wrapperSettings = pkgs: let
-      cfg = mkWrapperConfig pkgs;
-    in
-      wrapper.config.wrap {
-        inherit pkgs;
-        inherit (cfg) settings binName;
-      };
+    mkDevShellPackages = config:
+      builtins.concatLists (map (name: config.catPkgs.${name} or []) devShellCatOrder);
+    mkShellHook = config:
+      ''
+        echo 'I am a NixShell'
+      ''
+      + nixpkgs.lib.optionalString (config.cats.r or false) ''
+        export R_HOME=$(R RHOME)
+        export R_LIBS_SITE=$(strings "$(command -v R)" | grep -oP '/nix/store/[^:]+/library' | sort -u | paste -sd: -)
+        export R_LIBS_USER="$PWD/.r-libs"
+        mkdir -p "$R_LIBS_USER"
+      '';
 
     systems = [
       "aarch64-darwin"
@@ -93,35 +95,40 @@
         config = {allowUnfree = true;};
         overlays = [
           overlayDefs.dependencyOverlay
-          inputs.r-nvim-nix.overlays.default
-          inputs.fran.overlays.default
         ];
       };
 
     module = (import ./modules/neovim.nix) inputs;
-    wrapper = wrappers.lib.evalModule module;
   in {
+    lib = {
+      eval = {pkgs, modules ? []}: evalWithPkgs pkgs modules;
+      mkWrapper = {pkgs, modules ? []}: (evalWithPkgs pkgs modules).config.wrap {inherit pkgs;};
+      devShellPackages = config: mkDevShellPackages config;
+    };
+
     overlays = {
       # overlay `vv` wraps the module with default settings only.
-      # For the fully-configured binary (including mkWrapperConfig overrides),
-      # use `packages.<system>.default` instead.
+      # It is evaluated against the final package set so module defaults can
+      # depend on overlays such as rixpkgs-backed `pkgs.rpkgs`.
       default = nixpkgs.lib.composeManyExtensions [
         overlayDefs.dependencyOverlay
         (final: prev: {
-          vv = wrapper.config.wrap {pkgs = final;};
+          vv = (evalWithPkgs final []).config.wrap {pkgs = final;};
         })
       ];
       dependencies = overlayDefs.dependencyOverlay;
     };
 
     wrapperModules.default = module;
-    wrapperConfigs.default = wrapper.config;
+    wrapperConfigs.default = {pkgs, modules ? []}: (self.lib.eval {inherit pkgs modules;}).config;
 
     packages = forAllSystems (
       system: let
         pkgs = mkPkgs system;
       in {
-        default = wrapperSettings pkgs;
+        default = self.lib.mkWrapper {
+          inherit pkgs;
+        };
       }
     );
 
@@ -135,30 +142,13 @@
     devShells = forAllSystems (
       system: let
         pkgs = mkPkgs system;
-        nvimPkg = wrapperSettings pkgs;
-
-        shellPackages = [nvimPkg]
-          ++ wrapper.config.catPkgs.always or []
-          ++ wrapper.config.catPkgs.python or []
-          ++ wrapper.config.catPkgs.r or []
-          ++ wrapper.config.catPkgs.julia or []
-          ++ wrapper.config.catPkgs.markdown or []
-          ++ wrapper.config.catPkgs.optional or []
-          ++ wrapper.config.catPkgs.external or []
-          ++ wrapper.config.catPkgs.nix or []
-          ++ wrapper.config.catPkgs.lua or []
-          ++ wrapper.config.catPkgs.clickhouse or [];
+        config = (self.lib.eval {inherit pkgs;}).config;
+        nvimPkg = config.wrap {inherit pkgs;};
       in {
         default = pkgs.mkShell {
           name = "vShell";
-          packages = shellPackages;
-          shellHook = ''
-            echo 'I am a NixShell'
-            export R_HOME=$(R RHOME)
-            export R_LIBS_SITE=$(strings "$(command -v R)" | grep -oP '/nix/store/[^:]+/library' | sort -u | paste -sd: -)
-            export R_LIBS_USER="$PWD/.r-libs"
-            mkdir -p "$R_LIBS_USER"
-          '';
+          packages = [nvimPkg] ++ self.lib.devShellPackages config;
+          shellHook = mkShellHook config;
         };
       }
     );
@@ -166,10 +156,31 @@
     checks = forAllSystems (
       system: let
         pkgs = mkPkgs system;
-        nvimPkg = wrapperSettings pkgs;
+        defaultConfig = (self.lib.eval {inherit pkgs;}).config;
+        defaultNvimPkg = defaultConfig.wrap {inherit pkgs;};
+        defaultShellHook = mkShellHook defaultConfig;
+        overrideConfig =
+          (self.lib.eval {
+            inherit pkgs;
+            modules = [
+              {
+                cats = {
+                  r = false;
+                  python = true;
+                };
+                settings.lang_packages.python = nixpkgs.lib.mkForce (with pkgs.python3Packages; [
+                  pandas
+                ]);
+                catPkgs.nix = nixpkgs.lib.mkForce [
+                  pkgs.alejandra
+                ];
+              }
+            ];
+          }).config;
+        overrideShellHook = mkShellHook overrideConfig;
       in {
         default = pkgs.runCommand "check-vv" {} ''
-          BINARY_PATH="${nvimPkg}/bin/vv"
+          BINARY_PATH="${defaultNvimPkg}/bin/vv"
 
           if [ ! -x "$BINARY_PATH" ]; then
             echo "Error: Binary not found or not executable"
@@ -186,10 +197,36 @@
           fi
         '';
         module-eval = let
-          _ = wrapper.config;
+          _ = (self.lib.eval {inherit pkgs;}).config;
         in
           pkgs.runCommand "check-module-eval" {} ''
             echo "Module evaluation successful" > $out
+          '';
+        downstream-overrides = let
+          overrideNix = builtins.map (p: p.pname or p.name) overrideConfig.catPkgs.nix;
+          defaultAssertions = [
+            (defaultConfig.cats.r or false)
+            (builtins.match ".*R RHOME.*" defaultShellHook != null)
+            (builtins.length (self.lib.devShellPackages defaultConfig) > 0)
+          ];
+          overrideAssertions = [
+            (!(overrideConfig.cats.r or false))
+            (builtins.length overrideNix == 1)
+            ((builtins.head overrideNix) == "alejandra")
+            (builtins.match ".*R RHOME.*" overrideShellHook == null)
+          ];
+        in
+          pkgs.runCommand "check-downstream-overrides" {
+            pass =
+              if builtins.all (x: x) (defaultAssertions ++ overrideAssertions)
+              then "1"
+              else "";
+          } ''
+            if [ -z "$pass" ]; then
+              echo "Downstream override assertions failed" >&2
+              exit 1
+            fi
+            echo "Downstream override assertions passed" > $out
           '';
       }
     );

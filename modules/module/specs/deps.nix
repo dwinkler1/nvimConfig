@@ -13,13 +13,13 @@
     };
   };
 
-  config.specs.always = lib.mkIf (config.cats.always or true) {
+  config.specs.always = lib.mkIf (config.cats.always or false) {
     data = lib.mkDefault null;
     runtimeDeps = "prefix";
     runtimePkgs = config.catPkgs.always;
   };
 
-  config.specs.external = lib.mkIf (config.cats.external or true) {
+  config.specs.external = lib.mkIf (config.cats.external or false) {
     data = lib.mkDefault null;
     before = ["INIT_MAIN"];
     config = ''
@@ -29,50 +29,50 @@
     runtimePkgs = config.catPkgs.external;
   };
 
-  config.specs.optional = lib.mkIf (config.cats.optional or true) {
+  config.specs.optional = lib.mkIf (config.cats.optional or false) {
     data = lib.mkDefault null;
     runtimeDeps = "prefix";
     before = ["INIT_MAIN"];
     runtimePkgs = config.catPkgs.optional;
   };
 
-  config.specs.markdown = lib.mkIf (config.cats.markdown or true) {
+  config.specs.markdown = lib.mkIf (config.cats.markdown or false) {
     data = lib.mkDefault null;
     runtimeDeps = "prefix";
     runtimePkgs = config.catPkgs.markdown;
   };
 
-  config.specs.nix = lib.mkIf (config.cats.nix or true) {
+  config.specs.nix = lib.mkIf (config.cats.nix or false) {
     data = lib.mkDefault null;
     runtimeDeps = "prefix";
     runtimePkgs = config.catPkgs.nix;
   };
 
-  config.specs.lua = lib.mkIf (config.cats.lua or true) {
+  config.specs.lua = lib.mkIf (config.cats.lua or false) {
     data = lib.mkDefault null;
     runtimeDeps = "prefix";
     runtimePkgs = config.catPkgs.lua;
   };
 
-  config.specs.python = lib.mkIf (config.cats.python or true) {
+  config.specs.python = lib.mkIf (config.cats.python or false) {
     data = lib.mkDefault null;
     runtimeDeps = "prefix";
     runtimePkgs = config.catPkgs.python;
   };
 
-  config.specs.r = lib.mkIf (config.cats.r or true) {
+  config.specs.r = lib.mkIf (config.cats.r or false) {
     data = lib.mkDefault null;
     runtimeDeps = "prefix";
     runtimePkgs = config.catPkgs.r;
   };
 
-  config.specs.julia = lib.mkIf (config.cats.julia or true) {
+  config.specs.julia = lib.mkIf (config.cats.julia or false) {
     data = lib.mkDefault null;
     runtimeDeps = "prefix";
     runtimePkgs = config.catPkgs.julia;
   };
 
-  config.specs.clickhouse = lib.mkIf (config.cats.clickhouse or true) {
+  config.specs.clickhouse = lib.mkIf (config.cats.clickhouse or false) {
     data = lib.mkDefault null;
     runtimeDeps = "prefix";
     runtimePkgs = config.catPkgs.clickhouse;

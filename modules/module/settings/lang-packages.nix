@@ -1,5 +1,6 @@
 {
   config,
+  pkgs,
   lib,
   ...
 }:
@@ -26,14 +27,29 @@
     };
     default = { };
     description = ''
-      Language-specific package overrides appended to each language spec's runtimePackages.
-      Intended for flake.nix overrides via wrapper.config.wrap.
+      Language-specific package defaults and downstream overrides appended to each
+      language spec's runtime packages.
     '';
   };
 
   config.settings.lang_packages = {
-    python = lib.mkDefault [ ];
-    r = lib.mkDefault [ ];
-    julia = lib.mkDefault [ ];
+    python = lib.mkDefault (with pkgs.python3Packages; [
+      duckdb
+      polars
+    ]);
+    r = lib.mkDefault (
+      (with pkgs.rpkgs.rPackages; [
+        arrow
+        broom
+        data_table
+        janitor
+        styler
+      ])
+      ++ [pkgs.nvimcom]
+    );
+    julia = lib.mkDefault [
+      "DataFramesMeta"
+      "QuackIO"
+    ];
   };
 }

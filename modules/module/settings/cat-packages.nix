@@ -70,7 +70,6 @@ in
       tokei
       wget
       yq
-      zathura
     ]);
 
     python = maybe "python" (let
@@ -90,15 +89,14 @@ in
 
     r = maybe "r" (let
       r_packages = (pkgs.baseRPackages or [ ]) ++ config.settings.lang_packages.r;
-    in
-      with pkgs; [
-        (rWrapper.override { packages = r_packages; })
-        radianWrapper
-        (quarto.override { extraRPackages = r_packages; })
-        air-formatter
-        yaml-language-server
-        rnvimserver
-      ]);
+    in [
+      (pkgs.rpkgs.rWrapper.override { packages = r_packages; })
+      pkgs.rpkgs.radianWrapper
+      (pkgs.rpkgs.quarto.override { extraRPackages = r_packages; })
+      pkgs.air-formatter
+      pkgs.yaml-language-server
+      pkgs.rnvimserver
+    ]);
 
     # cats without packages get empty lists
     general = [ ];

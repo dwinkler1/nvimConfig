@@ -61,7 +61,7 @@ now(function()
       min_editor_width = 80,
       rconsole_height = 20,
       nvimpager = "split_h",
-      pdfviewer = "zathura",
+      pdfviewer = "",
     })
   end
 end)

@@ -4,11 +4,11 @@
   lib,
   ...
 }: {
-  config.specs.gitPlugins = lib.mkIf (config.cats.gitPlugins or true) {
+  config.specs.gitPlugins = lib.mkIf (config.cats.gitPlugins or false) {
     data = [];
   };
 
-  config.specs.r = lib.mkIf (config.cats.r or true) {
+  config.specs.r = lib.mkIf (config.cats.r or false) {
     data = with pkgs.vimPlugins; [
       pkgs.r-nvim
       quarto-nvim
@@ -19,14 +19,14 @@
     ];
   };
 
-  config.specs.markdown-lazy = lib.mkIf (config.cats.markdown or true) {
+  config.specs.markdown-lazy = lib.mkIf (config.cats.markdown or false) {
     lazy = true;
     data = [
       config.nvim-lib.neovimPlugins.cmp-pandoc-references
     ];
   };
 
-  config.specs.general = lib.mkIf (config.cats.general or true) {
+  config.specs.general = lib.mkIf (config.cats.general or false) {
     data = with pkgs.vimPlugins; [
       lze
       lzextras
@@ -79,7 +79,7 @@
     ];
   };
 
-  config.specs.lua = lib.mkIf (config.cats.lua or true) {
+  config.specs.lua = lib.mkIf (config.cats.lua or false) {
     data = with pkgs.vimPlugins; [
       luvit-meta
       {
@@ -89,7 +89,7 @@
     ];
   };
 
-  config.specs.markdown = lib.mkIf (config.cats.markdown or true) {
+  config.specs.markdown = lib.mkIf (config.cats.markdown or false) {
     data = with pkgs.vimPlugins; [
       quarto-nvim
       render-markdown-nvim
@@ -104,7 +104,7 @@
     ];
   };
 
-  config.specs.utils = lib.mkIf (config.cats.utils or true) {
+  config.specs.utils = lib.mkIf (config.cats.utils or false) {
     data = with pkgs.vimPlugins; [
       blink-cmp
       nvim-lspconfig
@@ -119,7 +119,7 @@
     ];
   };
 
-  config.specs.treesitterParsers = lib.mkIf (config.cats.treesitterParsers or true) {
+  config.specs.treesitterParsers = lib.mkIf (config.cats.treesitterParsers or false) {
     data = with pkgs.vimPlugins.nvim-treesitter-parsers; [
       bash
       c
@@ -158,7 +158,7 @@
     ];
   };
 
-  config.specs.utils-lazy = lib.mkIf (config.cats.utils or true) {
+  config.specs.utils-lazy = lib.mkIf (config.cats.utils or false) {
     lazy = true;
     data = with pkgs.vimPlugins; [
       blink-compat
@@ -175,7 +175,7 @@
     ];
   };
 
-  config.specs.gitPlugins-lazy = lib.mkIf (config.cats.gitPlugins or true) {
+  config.specs.gitPlugins-lazy = lib.mkIf (config.cats.gitPlugins or false) {
     lazy = true;
     data = [];
   };

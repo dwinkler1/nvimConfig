@@ -33,11 +33,9 @@ Modular Neovim wrapper config. Defines a wrapped `vv` binary with per-category p
         config.allowUnfree = true;
         overlays = [ nvimConfig.overlays.dependencies ];
       };
-      evalResult = nvimConfig.inputs.wrappers.lib.evalModules {
-        modules = [
-          nvimConfig.wrapperModules.default
-          projectSettings  # see below
-        ];
+      evalResult = nvimConfig.lib.eval {
+        inherit pkgs;
+        modules = [ projectSettings ];  # see below
       };
     in {
       default = evalResult.config.wrap { inherit pkgs; };
@@ -49,19 +47,14 @@ Modular Neovim wrapper config. Defines a wrapped `vv` binary with per-category p
         config.allowUnfree = true;
         overlays = [ nvimConfig.overlays.dependencies ];
       };
-      evalResult = nvimConfig.inputs.wrappers.lib.evalModules {
-        modules = [
-          nvimConfig.wrapperModules.default
-          projectSettings
-        ];
+      evalResult = nvimConfig.lib.eval {
+        inherit pkgs;
+        modules = [ projectSettings ];
       };
       nv = evalResult.config.wrap { inherit pkgs; };
     in {
       default = pkgs.mkShell {
-        packages =
-          [ nv ]
-          ++ (evalResult.config.catPkgs.markdown or [])
-          ++ (evalResult.config.catPkgs.nix or []);
+        packages = [ nv ] ++ nvimConfig.lib.devShellPackages evalResult.config;
       };
     });
   };
@@ -92,7 +85,96 @@ Modular Neovim wrapper config. Defines a wrapped `vv` binary with per-category p
 
 ## Overriding settings
 
-Define a `projectSettings` attrset and pass it as the second module in `evalModules`. Every option in `nvimConfig.wrapperConfigs.default` can be overridden here.
+Define a `projectSettings` attrset and pass it to `nvimConfig.lib.eval` or `nvimConfig.lib.mkWrapper`. The helper injects your overlaid `pkgs` automatically, so downstream consumers do not need to wire `specialArgs` themselves. Every option in `nvimConfig.wrapperConfigs.default` can be overridden here. Local `packages.default`, local `devShells.default`, downstream helper usage, and `pkgs.vv` all resolve the same module defaults unless you override them.
+
+### Basic downstream flake example
+
+This example enables a few cats, adds runtime tools to the shared wrapper/devShell package set, and appends language libraries to the default Python and R environments.
+
+```nix
+{
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    rixpkgs.url = "github:dwinkler1/rixpkgs/af2dd3f7b4b172077747c0869d4e30702fb71b0e";
+    fran = {
+      url = "github:dwinkler1/fran";
+      inputs.nixpkgs.follows = "rixpkgs";
+    };
+    nvimConfig = {
+      url = "github:dwinkler1/nvimConfig";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        rixpkgs.follows = "rixpkgs";
+        fran.follows = "fran";
+      };
+    };
+  };
+
+  outputs = { nixpkgs, nvimConfig, ... }: let
+    system = "aarch64-darwin";
+    pkgs = import nixpkgs {
+      inherit system;
+      config.allowUnfree = true;
+      overlays = [ nvimConfig.overlays.dependencies ];
+    };
+    projectSettings = {
+      cats = {
+        python = true;
+        r = true;
+        nix = true;
+        markdown = true;
+        optional = true;
+      };
+
+      settings.lang_packages = {
+        python = with pkgs.python3Packages; [
+          pandas
+          pyarrow
+        ];
+        r = with pkgs.rpkgs.rPackages; [
+          fixest
+          modelsummary
+        ];
+      };
+
+      catPkgs = {
+        python = [
+          (pkgs.python3.withPackages (ps:
+            ps
+            ++ (with ps; [
+              pandas
+              pyarrow
+            ])))
+          pkgs.ruff
+          pkgs.basedpyright
+          pkgs.uv
+          pkgs.nodejs
+        ];
+        nix = [
+          pkgs.alejandra
+          pkgs.nil
+        ];
+        optional = [
+          pkgs.git
+          pkgs.fd
+          pkgs.ripgrep
+        ];
+      };
+    };
+    evalResult = nvimConfig.lib.eval {
+      inherit pkgs;
+      modules = [ projectSettings ];
+    };
+    nv = evalResult.config.wrap { inherit pkgs; };
+  in {
+    packages.${system}.default = nv;
+
+    devShells.${system}.default = pkgs.mkShell {
+      packages = [ nv ] ++ nvimConfig.lib.devShellPackages evalResult.config;
+    };
+  };
+}
+```
 
 ### Categories
 
@@ -112,9 +194,13 @@ projectSettings = {
 };
 ```
 
-### Language packages (overlay extension)
+### Language packages (module defaults)
 
-Add Python/R/Julia libraries that get appended to the overlay base packages.
+Add Python/R/Julia libraries that get appended to the module defaults. The built-in defaults are:
+
+- Python: `duckdb`, `polars`
+- R: `arrow`, `broom`, `data_table`, `janitor`, `styler`, `nvimcom`
+- Julia: `DataFramesMeta`, `QuackIO`
 
 ```nix
 projectSettings = {
@@ -138,7 +224,7 @@ projectSettings = {
 
 ### Runtime dependencies (per-cat packages)
 
-Override `catPkgs` to add tools that appear in both the wrapper PATH and the devShell. To add always-available packages not gated by any cat, use `runtimePkgs` directly (see next section).
+Override `catPkgs` to change the full runtime tool lists that appear in both the wrapper PATH and the devShell. Use normal assignments to merge list values, or `lib.mkForce` to replace them.
 
 ```nix
 projectSettings = {
@@ -178,6 +264,14 @@ projectSettings = {
 ```
 
 `env` values are forced; `envDefault` values can be overridden by the user's shell.
+
+### Choosing the right override surface
+
+- Use `cats` to enable or disable a whole language or tooling category.
+- Use `settings.lang_packages` to add or replace Python, R, or Julia libraries within a language environment.
+- Use `catPkgs` to change the full runtime tool list for a category. `config.runtimePkgs` drives wrapper PATH composition, while `nvimConfig.lib.devShellPackages config` returns the package-only list suitable for `mkShell`.
+- Use `env` or `envDefault` for wrapper environment variables.
+- Use `specs` for plugin additions or custom runtime behavior.
 
 ### Neovim settings
 
@@ -226,22 +320,20 @@ projectSettings = {
 ## Architecture
 
 ```
-langPackages (flake.nix) ──► settings.lang_packages (module option)
-                                        │
-cats.nix ──► config.cats                │
-                  │                     │
-                  ▼                     ▼
-          cat-packages.nix ──► config.catPkgs.<cat>
-                  │                     │
-          ┌───────┘                     │
-          ▼                             ▼
-   deps.nix (runtimePkgs)       flake.nix (devShells)
-          │                             │
-          ▼                             ▼
-   wrapped vv PATH              nix develop PATH
+settings/lang-packages.nix ──► settings.lang_packages
+                                             │
+cats.nix ───────────────► config.cats        │
+                     │                       │
+                     ▼                       ▼
+             cat-packages.nix ───────► config.catPkgs.<cat>
+                     │                       │
+                     ├──────────────┐        │
+                     ▼              ▼        ▼
+             deps.nix PATH     wrapper.config.wrap   devShells.default
 ```
 
-- **Overlays** (`overlays/`) inject base packages into nixpkgs (rWrapper, quarto, baseRPackages, basePythonPackages).
+- **Overlays** (`overlays/`) inject dependency package sets into nixpkgs (`rpkgs`, `baseRPackages`, `basePythonPackages`, plugins). Top-level `rWrapper` and `quarto` are compatibility conveniences, but `pkgs.rpkgs` is the canonical R surface for downstream configuration.
 - **cat-packages.nix** is the single source of truth for per-category packages. Each list is gated by its cat toggle.
 - **deps.nix** wires `catPkgs` into the wrapper's runtime PATH.
-- **flake.nix** reads `catPkgs` for the devShell. `langPackages` feeds into `settings.lang_packages`.
+- **settings.lang_packages** holds the shared defaults used by local outputs and downstream module consumers.
+- **flake.nix** exports `lib.eval`, `lib.mkWrapper`, and `lib.devShellPackages` as the canonical downstream helpers, and builds `packages.default` and `devShells.default` from the same module config.

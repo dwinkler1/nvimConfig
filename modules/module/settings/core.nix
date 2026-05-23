@@ -16,7 +16,7 @@
 
   # Lua packages available to neovim (for :lua require())
   config.settings.nvim_lua_env = lp:
-    lib.optionals (config.cats.general or true) [ lp.tiktoken_core ];
+    lib.optionals (config.cats.general or false) [ lp.tiktoken_core ];
 
   # Binary name for the wrapper
   config.binName = lib.mkDefault "vv";

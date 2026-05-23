@@ -29,7 +29,7 @@
         ];
       };
     }
-    (lib.mkIf (config.cats.julia or true) {
+    (lib.mkIf (config.cats.julia or false) {
       jl = {
         nvim-host.enable = true;
         nvim-host.package = "${pkgs.julia-bin}/bin/julia";
@@ -39,10 +39,10 @@
         ];
       };
     })
-    (lib.mkIf (config.cats.python or true) {
+    (lib.mkIf (config.cats.python or false) {
       python3.nvim-host.enable = true;
     })
-    (lib.mkIf (config.cats.r or true) {
+    (lib.mkIf (config.cats.r or false) {
       r = {
         nvim-host.enable = true;
         nvim-host.package = "${pkgs.rWrapper}/bin/R";
