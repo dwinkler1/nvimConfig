@@ -176,7 +176,7 @@ if vim.g.neovide then
   vim.g.neovide_cursor_short_animation_length = 0
   vim.g.neovide_font_hinting = 'none'
   vim.g.neovide_font_edging = 'subpixelantialias'
-  vim.o.guifont = 'Iosevka Nerd Font,Symbols Nerd Font:h14:#e-subpixelantialias:#h-none'
+  vim.o.guifont = 'JetBrainsMono Nerd Font,Symbols Nerd Font:h14:#e-subpixelantialias:#h-none'
   vim.g.neovide_floating_corner_radius = 0.35
   vim.keymap.set("n", "<leader>nf", "<cmd>NeovideFullscreen<CR>", { desc = "Toggle Neovide Fullscreen" })
 end
