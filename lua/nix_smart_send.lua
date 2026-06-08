@@ -22,9 +22,11 @@ local COMMENT_TYPES = {
 }
 
 function M.get_current_node()
-  local ts_utils = require('nvim-treesitter.ts_utils')
   local cur_win = vim.api.nvim_get_current_win()
-  return ts_utils.get_node_at_cursor(cur_win, true)
+  return vim.treesitter.get_node({
+    winid = cur_win,
+    ignore_injections = true,
+  })
 end
 
 function M.detect_global_node()
@@ -50,7 +52,6 @@ function M.detect_global_node()
 end
 
 function M.move_to_next_non_empty_line()
-  local ts_utils = require('nvim-treesitter.ts_utils')
   -- Search for the next non-empty line
   local line_num = vim.fn.search("[^;\\s]", "W")
 
@@ -86,25 +87,27 @@ function M.move_to_next_non_empty_line()
     line_content = vim.api.nvim_buf_get_lines(0, line_num - 1, line_num, false)[1]
     first_non_ws = line_content:find("%S") or 1
     vim.api.nvim_win_set_cursor(0, { line_num, first_non_ws - 1 })
-    node = ts_utils.get_node_at_cursor()
+    node = vim.treesitter.get_node()
   end
 
   return true
 end
 
 function M.vselect_node(node)
-  local ts_utils = require('nvim-treesitter.ts_utils')
   if not node then
     return false
   end
 
-  local cur_buf = vim.api.nvim_get_current_buf()
-  ts_utils.update_selection(cur_buf, node, "V")
+  local start_row, _, end_row, _ = node:range()
+
+  vim.api.nvim_win_set_cursor(0, { start_row + 1, 0 })
+  vim.cmd("normal! V")
+  vim.api.nvim_win_set_cursor(0, { end_row + 1, 0 })
+
   return true
 end
 
 function M.select_until_global(global_nodes)
-  local ts_utils = require('nvim-treesitter.ts_utils')
   local root_node = M.detect_global_node()
   if not root_node and global_nodes then
     root_node = global_nodes[1]
@@ -113,7 +116,7 @@ function M.select_until_global(global_nodes)
   -- Use empty table if no global nodes provided
   global_nodes = global_nodes or {}
 
-  local node = ts_utils.get_node_at_cursor()
+  local node = vim.treesitter.get_node()
   if not node then
     -- print("No syntax node found at cursor position")
     return nil
@@ -167,7 +170,6 @@ function M.slime_send_region()
 end
 
 function M.send_repl(global_nodes)
-  local ts_utils = require('nvim-treesitter.ts_utils')
   local cur_node = M.get_current_node()
 
   if not cur_node then
@@ -189,7 +191,9 @@ function M.send_repl(global_nodes)
   M.slime_send_region()
 
   -- Move cursor and continue
-  ts_utils.goto_node(sel_node, true)
+  local _, _, er, ec = sel_node:range()
+  vim.api.nvim_win_set_cursor(0, { er + 1, ec })
+
   M.move_to_next_non_empty_line()
 end
 
