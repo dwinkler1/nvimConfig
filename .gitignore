@@ -5,3 +5,4 @@
 .nvimcom
 .commandcode
 .commandcode/
+.r-*
