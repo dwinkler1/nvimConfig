@@ -217,20 +217,26 @@ now_if_args(function()
     "make", "xml", "zig", "regex", "csv", "bash",
     "markdown_inline", "quarto", "rmd", "codecompanion",
   }
+  local function start_treesitter(buf, filetype)
+    local lang = vim.treesitter.language.get_lang(filetype) or filetype
+    if #vim.api.nvim_get_runtime_file("parser/" .. lang .. ".*", false) == 0 then
+      return
+    end
+    vim.treesitter.start(buf, lang)
+    vim.bo[buf].indentexpr = "v:lua.require('nvim-treesitter').indentexpr()"
+  end
+
   vim.api.nvim_create_autocmd("FileType", {
     pattern = ts_filetypes,
     callback = function(ev)
-      local lang = ev.match
-      if vim.treesitter.language.get_lang then
-        lang = vim.treesitter.language.get_lang(lang) or lang
-      end
-      if #vim.api.nvim_get_runtime_file("parser/" .. lang .. ".*", false) == 0 then
-        return
-      end
-      vim.treesitter.start(ev.buf, lang)
-      vim.bo[ev.buf].indentexpr = "v:lua.require('nvim-treesitter').indentexpr()"
+      start_treesitter(ev.buf, vim.bo[ev.buf].filetype)
     end,
   })
+
+  -- FileType may have fired before this deferred setup ran.
+  if vim.bo.filetype ~= "" then
+    start_treesitter(0, vim.bo.filetype)
+  end
 
   require("nvim-treesitter-textobjects").setup({
     move = {

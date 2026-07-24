@@ -240,12 +240,7 @@
 
     homeModules.default = wrappers.lib.getInstallModule {
       name = "vModule";
-      value = [
-        module
-        {
-          config.install.optionLocation = [ "home" "packages" ];
-        }
-      ];
+      value = module;
     };
   };
 }
