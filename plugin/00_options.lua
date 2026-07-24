@@ -128,27 +128,20 @@ local diagnostic_opts = {
   -- Don't update diagnostics when typing
   update_in_insert = false,
 }
-later(function() vim.diagnostic.config(diagnostic_opts) end)
+later(function()
+  vim.diagnostic.config(diagnostic_opts)
 
-
--- Custom autocommands ========================================================
-local augroup = vim.api.nvim_create_augroup('CustomSettings', {})
-
-vim.api.nvim_create_autocmd('FileType', {
-  pattern = { 'markdown' },
-  group = augroup,
-  callback = function()
-    vim.diagnostic.config({
-      signs = {
-        severity = { min = 'WARN', max = 'ERROR' }
-      },
-      virtual_text = {
-        current_line = false,
-        severity = { min = 'HINT', max = 'ERROR' }
-      }
-    })
-  end
-})
+  -- Relax diagnostics for markdown (many false positives)
+  vim.api.nvim_create_autocmd('FileType', {
+    pattern = { 'markdown' },
+    callback = function()
+      vim.diagnostic.config({
+        signs = { severity = { min = 'WARN', max = 'ERROR' } },
+        virtual_text = { severity = { min = 'HINT', max = 'ERROR' }, current_line = false },
+      })
+    end,
+  })
+end)
 
 vim.api.nvim_create_autocmd("FileType", {
   desc = "remove formatoptions",
@@ -156,17 +149,6 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.opt.formatoptions:remove({ "r", "o" }) -- Don't continue comments on enter or o
     vim.b.minitrailspace_disable = true        -- Don't highlight trailing space by default
   end,
-})
-
-vim.api.nvim_create_autocmd('FileType', {
-  group = augroup,
-  callback = function()
-    -- Don't auto-wrap comments and don't insert comment leader after hitting 'o'
-    -- If don't do this on `FileType`, this keeps reappearing due to being set in
-    -- filetype plugins.
-    vim.cmd('setlocal formatoptions-=r formatoptions-=o')
-  end,
-  desc = [[Ensure proper 'formatoptions']],
 })
 -- Neovide  ==============================================
 if vim.g.neovide then
@@ -176,7 +158,7 @@ if vim.g.neovide then
   vim.g.neovide_cursor_short_animation_length = 0
   vim.g.neovide_font_hinting = 'none'
   vim.g.neovide_font_edging = 'subpixelantialias'
-  vim.o.guifont = 'JetBrainsMono Nerd Font,Symbols Nerd Font:h14:#e-subpixelantialias:#h-none'
+  vim.o.guifont = 'JetBrainsMono Nerd Font:h14:#e-subpixelantialias:#h-none'
   vim.g.neovide_floating_corner_radius = 0.35
   vim.keymap.set("n", "<leader>nf", "<cmd>NeovideFullscreen<CR>", { desc = "Toggle Neovide Fullscreen" })
 end

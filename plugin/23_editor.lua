@@ -2,10 +2,10 @@ local later = MiniDeps.later
 local add = Config.add
 
 if not Config.isNixCats then
-  local m_add = MiniDeps.add
+  local add = MiniDeps.add
 
   later(function()
-    m_add("stevearc/conform.nvim")
+    add("stevearc/conform.nvim")
   end)
 end
 
@@ -22,20 +22,6 @@ later(function()
       r = { "air" },
       rmd = { "injected" },
       quarto = { "injected" },
-    },
-
-    default_format_opts = {
-      lsp_format = "fallback",
-    },
-
-    formatters = {
-      my_styler = {
-        command = "R",
-        -- A list of strings, or a function that returns a list of strings
-        -- Return a single string instead of a list to run the command in a shell
-        args = { "-s", "-e", "styler::style_file(commandArgs(TRUE)[1])", "--args", "$FILENAME" },
-        stdin = false,
-      },
     },
   })
 end)

@@ -12,7 +12,7 @@ end
 
 Config.log = {}
 Config.log_buf_id = Config.log_buf_id or nil
-Config.start_hrtime = Config.start_hrtime or vim.loop.hrtime()
+Config.start_hrtime = Config.start_hrtime or vim.uv.hrtime()
 
 Config.log_print = function()
   if Config.log_buf_id == nil or not vim.api.nvim_buf_is_valid(Config.log_buf_id) then
@@ -24,7 +24,7 @@ end
 
 Config.log_clear = function()
   Config.log = {}
-  Config.start_hrtime = vim.loop.hrtime()
+  Config.start_hrtime = vim.uv.hrtime()
   vim.cmd('echo "Cleared log"')
 end
 

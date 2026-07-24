@@ -43,6 +43,7 @@ in
       python313Packages.pylatexenc
       quartoPkg
       zk
+      marksman
     ]);
 
     nix = maybe "nix" (with pkgs; [
@@ -99,13 +100,12 @@ in
       quartoPkg
       pkgs.air-formatter
       pkgs.yaml-language-server
-      pkgs.rnvimserver
     ];
 
     # cats without packages get empty lists
     general = [ ];
     gitPlugins = [ ];
-    treesitterParsers = [ pkgs.tree-sitter ];
+    treesitterParsers = [ ];
     utils = [ ];
   };
 }

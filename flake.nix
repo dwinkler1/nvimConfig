@@ -12,7 +12,7 @@
     rixpkgs.url = "github:dwinkler1/rixpkgs/nixpkgs";
 
     r-nvim-nix = {
-      url = "github:dwinkler1/r_nvim_nix/v0.99.5";
+      url = "github:dwinkler1/r_nvim_nix/v1.0.0";
       inputs = {
         nixpkgs.follows = "rixpkgs";
       };
@@ -69,7 +69,7 @@
       ''
       + nixpkgs.lib.optionalString (config.cats.r or false) ''
         export R_HOME=$(R RHOME)
-        export R_LIBS_SITE=$(strings "$(command -v R)" | grep -oP '/nix/store/[^:]+/library' | sort -u | paste -sd: -)
+        export R_LIBS_SITE=$(strings "$(command -v R)" | rg -o '/nix/store/[^:]+/library' | sort -u | paste -sd: -)
         export R_LIBS_USER="$PWD/.r-libs"
         mkdir -p "$R_LIBS_USER"
       '';
@@ -224,6 +224,12 @@
             fi
             echo "Downstream override assertions passed" > $out
           '';
+        lua-test = pkgs.runCommand "lua-test" {
+          buildInputs = [ pkgs.neovim-unwrapped ];
+        } ''
+          nvim --headless -u NONE -c "set runtimepath+=${./.}" -l ${./tests/init.lua}
+          touch $out
+        '';
       }
     );
 

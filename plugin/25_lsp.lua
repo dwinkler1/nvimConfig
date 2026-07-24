@@ -8,23 +8,13 @@ if not Config.isNixCats then
 end
 
 now_if_args(function()
+  -- R.nvim owns the R `r_ls` client and starts its bundled rnvimserver from
+  -- its own plugin directory. Keep R out of this generic server registry.
   local servers = {
-    clangd = {},
     basedpyright = {},
     ruff = {},
     marksman = {
       filetypes = { "markdown", "markdown_inline", "codecompanion" },
-    },
-    r_ls = {
-      filetypes = { 'r', 'rmd', 'rmarkdown' },
-      settings = {
-        ['r_ls'] = {
-          lsp = {
-            rich_documentation = true,
-            enable = true,
-          },
-        },
-      }
     },
     julials = {
       settings = {

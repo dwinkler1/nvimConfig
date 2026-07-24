@@ -66,21 +66,28 @@ nmap_leader('<Tab>', '<Cmd>bnext<CR>', 'Next buffer')
 nmap_leader('<S-Tab>', '<Cmd>bprev<CR>', 'Prev buffer')
 
 -- a is for 'AI'
+nmap_leader("aa", "<cmd>CodeCompanion /agent<CR>", "Agent chat (@{agent} tools)")
 nmap_leader("ac", "<cmd>CodeCompanionChat Toggle<CR>", "Chat Toggle")
--- nmap_leader("ae", "<cmd>CodeCompanion /explain<CR>", "Explain Code")
--- nmap_leader("af", "<cmd>CodeCompanion /fix<CR>", "Fix Code")
+nmap_leader("aC", function()
+  local chat = require("codecompanion").last_chat()
+  if not chat then
+    return vim.notify("No CodeCompanion chat to compact", vim.log.levels.WARN)
+  end
+  require("codecompanion.interactions.chat.context_management.compaction").compact(chat, { min_token_savings = 0 })
+end, "Compact chat")
 nmap_leader("ag", "<cmd>CodeCompanion /commit<CR>", "Generate commit message")
 nmap_leader("ai", "<cmd>CodeCompanionActions<CR>", "Chat Action")
 nmap_leader("al", "<cmd>CodeCompanion /lsp<CR>", "Explain LSP Diagnostics")
 nmap_leader("an", "<cmd>CodeCompanionChat Add<CR>", "Chat New")
 nmap_leader("as", "<cmd>CodeCompanion /suggest<CR>", "Suggest Improvements")
---nmap_leader("ax", "<cmd>CodeCompanion /fixer<CR>", "Code Fixer")
+nmap_leader("aw", "<cmd>CodeCompanion /tdd<CR>", "Workflow: plan, implement, test")
 nmap_leader("ax", "<cmd>CodeCompanion /fixer<CR>", "Code Fixer")
+xmap_leader("aa", "<cmd>CodeCompanion /agent<CR>", "Agent on selection")
 xmap_leader("ae", "<cmd>CodeCompanion /explain<CR>", "Explain Code")
 xmap_leader("af", "<cmd>CodeCompanion /fix<CR>", "Fix Code")
---xmap_leader("ap", "<cmd>CodeCompanion /expert<CR>", "Code Fixer")
-xmap_leader("ap", "<cmd>CodeCompanion /expert<CR>", "Code Fixer")
+xmap_leader("ap", "<cmd>CodeCompanion /expert<CR>", "Code Expert")
 xmap_leader("as", "<cmd>CodeCompanion /suggest<CR>", "Suggest Improvements")
+nmap_leader("ak", "<cmd>CodeCompanionChat adapter=codex<CR>", "Chat with Codex")
 
 -- b is for 'buffer'
 nmap_leader('bb', '<Cmd>b#<CR>', 'Alternate')
@@ -123,7 +130,7 @@ nmap_leader('fm', '<Cmd>Pick marks<CR>', 'Marks')
 nmap_leader('fn', '<cmd>ZkNotes<CR>', "Notes")
 nmap_leader('fk', '<Cmd>Pick keymaps<CR>', 'Keymaps')
 nmap_leader('fR', '<Cmd>Pick resume<CR>', 'Resume')
-nmap_leader('fp', '<Cmd>Pick projects<CR>', 'Projects')
+nmap_leader('fp', '<Cmd>Pick files<CR>', 'Files')
 nmap_leader('fq', '<Cmd>Pick list scope="quickfix"<CR>', 'Quickfix')
 nmap_leader('fr', '<Cmd>Pick lsp scope="references"<CR>', 'References (LSP)')
 nmap_leader('flr', '<Cmd>Pick lsp scope="references"<CR>', 'References (LSP)')
@@ -164,7 +171,7 @@ vim.keymap.set({ 'n' }, 'grk', '<Cmd>lua vim.lsp.buf.hover()<CR>', { desc = 'Doc
 vim.keymap.set({ 'n' }, 'gre', '<Cmd>lua vim.diagnostic.open_float()<CR>', { desc = 'Diagnostics' })
 
 nmap_lsp("K", '<Cmd>lua vim.lsp.buf.hover()<CR>', "Documentation")
-local formatting_cmd = '<Cmd>lua require("conform").format({ lsp_fallback = true })<CR>'
+local formatting_cmd = '<Cmd>lua require("conform").format({ lsp_format = "fallback" })<CR>'
 nmap_leader('la', '<Cmd>lua vim.lsp.buf.code_action()<CR>', 'Actions')
 nmap_leader('le', '<Cmd>lua vim.diagnostic.open_float()<CR>', 'Diagnostics popup')
 nmap_leader('lf', formatting_cmd, 'Format')
@@ -189,11 +196,9 @@ nmap_leader('Lx', '<Cmd>lua Config.execute_lua_line()<CR>', 'Execute `lua` line'
 
 -- o is for 'other'
 local trailspace_toggle_command = '<Cmd>lua vim.b.minitrailspace_disable = not vim.b.minitrailspace_disable<CR>'
-nmap_leader('od', '<Cmd>Neogen<CR>', 'Document')
 nmap_leader('oh', '<Cmd>normal gxiagxila<CR>', 'Move arg left')
 nmap_leader('ol', '<Cmd>normal gxiagxina<CR>', 'Move arg right')
 nmap_leader('or', '<Cmd>lua MiniMisc.resize_window()<CR>', 'Resize to default width')
-nmap_leader('oS', '<Cmd>lua Config.insert_section()<CR>', 'Section insert')
 nmap_leader('ot', '<Cmd>lua MiniTrailspace.trim()<CR>', 'Trim trailspace')
 nmap_leader('oT', trailspace_toggle_command, 'Trailspace hl toggle')
 nmap_leader('oz', '<Cmd>lua MiniMisc.zoom()<CR>', 'Zoom toggle')

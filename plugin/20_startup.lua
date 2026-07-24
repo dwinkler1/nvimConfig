@@ -208,112 +208,31 @@ now_if_args(function()
     on_attach = nil, -- (fun(buf: integer): boolean) return false to disable attaching
   }
 
-
-  local ok_configs, configs = pcall(require, "nvim-treesitter.configs")
-
-  if ok_configs and configs.setup then
-    local opts = {
-      highlight = { enable = true },
-      indent = { enable = false },
-      textobjects = {
-        move = {
-          enable = true,
-          set_jumps = true,
-          goto_next_start = {
-            ["]a"] = "@parameter.inner", -- fixed typo
-            ["]f"] = "@function.outer",
-            ["]o"] = "@loop.*",
-            ["]s"] = { query = "@local.scope", desc = "Next scope" },
-            ["]z"] = { query = "@fold", desc = "Next fold" },
-          },
-          goto_next_end = {
-            ["]M"] = "@function.outer",
-            ["]["] = "@class.outer",
-          },
-          goto_previous_start = {
-            ["[a"] = "@parameter.inner",
-            ["[f"] = "@function.outer",
-            ["[o"] = "@loop.*",
-            ["[s"] = { query = "@local.scope", query_group = "locals", desc = "Prev. scope" },
-            ["[z"] = { query = "@fold", query_group = "folds", desc = "Prev. fold" },
-          },
-          goto_previous_end = {
-            ["[M"] = "@function.outer",
-            ["[]"] = "@class.outer",
-          },
-          goto_next = {
-            ["]e"] = "@conditional.outer",
-          },
-          goto_previous = {
-            ["[e"] = "@conditional.outer",
-          },
-        },
-        swap = {
-          enable = true,
-          swap_next = {
-            ["<leader>x"] = "@parameter.inner",
-          },
-          swap_previous = {
-            ["<leader>X"] = "@parameter.inner",
-          },
-        },
-        lsp_interop = {
-          enable = true,
-          border = "none",
-          floating_preview_opts = {},
-          peek_definition_code = {
-            ["<leader>lm"] = "@function.outer",
-            ["<leader>lM"] = "@class.outer",
-          },
-        },
-      },
-    }
-
-
-    -- Manual parser check for non-Nix users
-    if not Config.isNixCats then
-      local installed_check = function(lang)
-        return #vim.api.nvim_get_runtime_file("parser/" .. lang .. ".*", false) == 0
-      end
-      local to_install = vim.tbl_filter(installed_check, opts.ensure_installed)
-      if #to_install > 0 then
-        require("nvim-treesitter").install(to_install)
-      end
-    end
-    -- Environment-specific Overrides
-    if not Config.isNixCats then
-      opts.auto_install = true
-      opts.ensure_installed = Config.treesitter_helpers.default_parsers
-    else
-      opts.auto_install = false
-      -- Nix handles installation, so ensure_installed is skipped/empty
-    end
-
-
-    configs.setup(opts)
-    return
-  end
-
+  local ts_filetypes = {
+    "c", "cpp", "lua", "nix", "python", "r", "markdown", "query",
+    "vim", "vimdoc", "yaml", "json", "toml", "rust", "go",
+    "javascript", "typescript", "tsx", "html", "css", "sql",
+    "julia", "rnoweb", "latex", "gitcommit", "gitignore",
+    "git_config", "git_rebase", "diff", "dockerfile",
+    "make", "xml", "zig", "regex", "csv", "bash",
+    "markdown_inline", "quarto", "rmd", "codecompanion",
+  }
   vim.api.nvim_create_autocmd("FileType", {
-    pattern = "*",
-    callback = function(args)
-      -- Use explicit buffer + filetype to avoid any ambiguity
-      local ok = pcall(vim.treesitter.start, args.buf, args.match)
-      vim.bo.syntax = 'on'
-      vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
-      vim.wo[0][0].foldexpr = 'v:lua.vim.treesitter.foldexpr()'
-      vim.wo[0][0].foldmethod = 'expr'
+    pattern = ts_filetypes,
+    callback = function(ev)
+      local lang = ev.match
+      if vim.treesitter.language.get_lang then
+        lang = vim.treesitter.language.get_lang(lang) or lang
+      end
+      if #vim.api.nvim_get_runtime_file("parser/" .. lang .. ".*", false) == 0 then
+        return
+      end
+      vim.treesitter.start(ev.buf, lang)
+      vim.bo[ev.buf].indentexpr = "v:lua.require('nvim-treesitter').indentexpr()"
     end,
   })
 
-  -- Textobjects: require plugin and bail out quietly if missing
-  local ok_nto, nto = pcall(require, "nvim-treesitter-textobjects")
-  if not ok_nto then
-    return
-  end
-
-  vim.g.no_plugin_maps = true
-  nto.setup({
+  require("nvim-treesitter-textobjects").setup({
     move = {
       set_jumps = true,
     },
@@ -322,70 +241,36 @@ now_if_args(function()
   local move = require("nvim-treesitter-textobjects.move")
   local swap = require("nvim-treesitter-textobjects.swap")
 
-  -- Map motion function names to actual functions
-  local move_fns = {
-    goto_next_start     = move.goto_next_start,
-    goto_next_end       = move.goto_next_end,
-    goto_previous_start = move.goto_previous_start,
-    goto_previous_end   = move.goto_previous_end,
-    goto_next           = move.goto_next,
-    goto_previous       = move.goto_previous,
-  }
+  vim.keymap.set("n", "]a", function() move.goto_next_start("@parameter.inner", "textobjects") end, { desc = "Next parameter" })
+  vim.keymap.set("n", "[a", function() move.goto_previous_start("@parameter.inner", "textobjects") end, { desc = "Prev parameter" })
+  vim.keymap.set("n", "]f", function() move.goto_next_start("@function.outer", "textobjects") end, { desc = "Next function" })
+  vim.keymap.set("n", "[f", function() move.goto_previous_start("@function.outer", "textobjects") end, { desc = "Prev function" })
+  vim.keymap.set("n", "]o", function() move.goto_next_start("@loop.*", "textobjects") end, { desc = "Next loop" })
+  vim.keymap.set("n", "[o", function() move.goto_previous_start("@loop.*", "textobjects") end, { desc = "Prev loop" })
+  vim.keymap.set("n", "]s", function() move.goto_next_start("@local.scope", "textobjects") end, { desc = "Next scope" })
+  vim.keymap.set("n", "[s", function() move.goto_previous_start("@local.scope", "locals") end, { desc = "Prev scope" })
+  vim.keymap.set("n", "]z", function() move.goto_next_start("@fold", "folds") end, { desc = "Next fold" })
+  vim.keymap.set("n", "[z", function() move.goto_previous_start("@fold", "folds") end, { desc = "Prev fold" })
+  vim.keymap.set("n", "]M", function() move.goto_next_end("@function.outer", "textobjects") end, { desc = "Next function end" })
+  vim.keymap.set("n", "][", function() move.goto_next_end("@class.outer", "textobjects") end, { desc = "Next class end" })
+  vim.keymap.set("n", "[M", function() move.goto_previous_end("@function.outer", "textobjects") end, { desc = "Prev function end" })
+  vim.keymap.set("n", "[]", function() move.goto_previous_end("@class.outer", "textobjects") end, { desc = "Prev class end" })
+  vim.keymap.set("n", "]e", function() move.goto_next("@conditional.outer", "textobjects") end, { desc = "Next conditional" })
+  vim.keymap.set("n", "[e", function() move.goto_previous("@conditional.outer", "textobjects") end, { desc = "Prev conditional" })
 
-  -- All motions defined in one place
-  -- spec = { query_or_list, query_group, desc }
-  local move_maps = {
-    goto_next_start = {
-      ["]a"] = { "@parameter.inner", "textobjects", "Next parameter" },
-      ["]f"] = { "@function.outer", "textobjects", "Next function start" },
-      ["]o"] = { { "@loop.inner", "@loop.outer" }, "textobjects", "Next loop" },
-      ["]s"] = { "@local.scope", "locals", "Next scope" },
-      ["]z"] = { "@fold", "folds", "Next fold" },
-    },
-    goto_next_end = {
-      ["]M"] = { "@function.outer", "textobjects", "Next function end" },
-      ["]["] = { "@class.outer", "textobjects", "Next class end" },
-    },
-    goto_previous_start = {
-      ["[a"] = { "@parameter.inner", "textobjects", "Previous parameter" },
-      ["[f"] = { "@function.outer", "textobjects", "Previous function start" },
-      ["[o"] = { { "@loop.inner", "@loop.outer" }, "textobjects", "Previous loop" },
-      ["[s"] = { "@local.scope", "locals", "Previous scope" },
-      ["[z"] = { "@fold", "folds", "Previous fold" },
-    },
-    goto_previous_end = {
-      ["[M"] = { "@function.outer", "textobjects", "Previous function end" },
-      ["[]"] = { "@class.outer", "textobjects", "Previous class end" },
-    },
-    goto_next = {
-      ["]e"] = { "@conditional.outer", "textobjects", "Next conditional" },
-    },
-    goto_previous = {
-      ["[e"] = { "@conditional.outer", "textobjects", "Previous conditional" },
-    },
-  }
+  vim.keymap.set("n", "<leader>x", function() swap.swap_next("@parameter.inner", "textobjects") end, { desc = "Swap parameter next" })
+  vim.keymap.set("n", "<leader>X", function() swap.swap_previous("@parameter.inner", "textobjects") end, { desc = "Swap parameter prev" })
 
-  -- Generate motion keymaps
-  for fn_name, maps in pairs(move_maps) do
-    local fn = move_fns[fn_name]
-    if fn then
-      for lhs, spec in pairs(maps) do
-        local query_or_list, group, desc = spec[1], spec[2], spec[3]
-        vim.keymap.set({ "n", "x", "o" }, lhs, function()
-          fn(query_or_list, group)
-        end, { desc = desc })
-      end
+  if not Config.isNixCats then
+    local installed_check = function(lang)
+      return #vim.api.nvim_get_runtime_file("parser/" .. lang .. ".*", false) == 0
+    end
+    local default_parsers = Config.treesitter_helpers.default_parsers
+    local to_install = vim.tbl_filter(installed_check, default_parsers)
+    if #to_install > 0 then
+      require("nvim-treesitter").install(to_install)
     end
   end
-
-  -- Swap keymaps (unchanged, but minimal)
-  vim.keymap.set("n", "<leader>x", function()
-    swap.swap_next("@parameter.inner")
-  end, { desc = "Swap with next parameter" })
-
-  vim.keymap.set("n", "<leader>X", function()
-    swap.swap_previous("@parameter.inner")
-  end, { desc = "Swap with previous parameter" })
 end)
 
 -- zk

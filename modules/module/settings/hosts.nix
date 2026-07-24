@@ -22,16 +22,6 @@ in
         nvim-host.flags."--neovim-bin" = "${builtins.placeholder "out"}/bin/${config.binName}";
       };
 
-      m = {
-        nvim-host.enable = false;
-        nvim-host.package = "${pkgs.uv}/bin/uv";
-        nvim-host.argv0 = "uv";
-        nvim-host.addFlag = [
-          "run"
-          "marimo"
-          "edit"
-        ];
-      };
     }
     (lib.mkIf (config.cats.julia or false) {
       jl = {

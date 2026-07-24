@@ -14,10 +14,6 @@
   # Enable RC wrapping (allows neovim to find the config)
   config.settings.wrapRc = lib.mkDefault true;
 
-  # Lua packages available to neovim (for :lua require())
-  config.settings.nvim_lua_env = lp:
-    lib.optionals (config.cats.general or false) [ lp.tiktoken_core ];
-
   # Binary name for the wrapper
   config.binName = lib.mkDefault "vv";
 

@@ -11,10 +11,9 @@
       UV_PYTHON_DOWNLOADS = "never";
       UV_PYTHON = pkgs.python.interpreter;
     })
-    (lib.mkIf (config.cats.r or false) {
-      RNVIM_COMPLDIR = "$PWD/.r-compl";
-      TMPDIR = "$PWD/.r-tmp";
-    })
+    # R.nvim v1.x owns its cache and temporary directories and exports
+    # RNVIM_COMPLDIR/RNVIM_TMPDIR during setup. Do not inject literal `$PWD`
+    # values into the wrapper environment.
   ];
 
   # Environment variables with defaults (can be overridden by user)

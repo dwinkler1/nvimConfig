@@ -5,12 +5,20 @@ on:
     paths:
       - 'flake.lock'
       - 'flake.nix'
-      - 'modules'
+      - 'modules/**'
+      - 'plugin/**'
+      - 'lua/**'
+      - 'overlays/**'
+      - 'ftplugin/**'
   pull_request:
     paths:
       - 'flake.lock'
       - 'flake.nix'
-      - 'modules'
+      - 'modules/**'
+      - 'plugin/**'
+      - 'lua/**'
+      - 'overlays/**'
+      - 'ftplugin/**'
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -35,5 +43,5 @@ jobs:
         authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
         extraPullNames: rstats-on-nix, nix-community    
     - run: nix build
-    - run: nix develop
+    - run: nix develop -c echo ok
     - run: nix flake check

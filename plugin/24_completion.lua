@@ -4,7 +4,7 @@ local now = MiniDeps.now
 local now_if_args = Config.now_if_args
 
 -- Constants
-local BLINK_VERSION = "v1.4.1"
+local BLINK_VERSION = "v1.10.2"
 
 -- Plugin sources configuration
 local PLUGIN_SOURCES = {
@@ -26,24 +26,14 @@ local PLUGIN_ADDS = {
 -- Helper functions
 local function create_system_prompt(role_description)
   return function(context)
-    return "I want you to act as a senior " .. context.filetype .. " developer. " .. role_description
+    local lang = context.filetype or "programmer"
+    return "I want you to act as a senior " .. lang .. " developer. " .. role_description
   end
 end
 
 local function get_code_block(context)
-  local text = require("codecompanion.helpers.actions").get_code(context.start_line, context.end_line)
+  local text = require("codecompanion.helpers.code").get_code(context.start_line, context.end_line)
   return "```" .. context.filetype .. "\n" .. text .. "\n```"
-end
-
-local function create_common_opts(mapping, short_name)
-  return {
-    mapping = mapping,
-    modes = { "v" },
-    short_name = short_name,
-    auto_submit = true,
-    stop_context_insertion = true,
-    user_prompt = true,
-  }
 end
 
 local function get_mini_icons_highlight(ctx)
@@ -57,7 +47,7 @@ local function get_blink_fuzzy_setting()
   }
 
   if not Config.isNixCats then
-    setting.prebuilt_binary = { force_version = BLINK_VERSION }
+    setting.prebuilt_binaries = { force_version = BLINK_VERSION }
   end
 
   return setting
@@ -65,10 +55,10 @@ end
 
 -- Plugin loading
 if not Config.isNixCats then
-  local m_add = MiniDeps.add
+  local add = MiniDeps.add
 
   now_if_args(function()
-    m_add({
+    add({
       source = "saghen/blink.cmp",
       depends = { "rafamadriz/friendly-snippets" },
       checkout = BLINK_VERSION,
@@ -77,38 +67,91 @@ if not Config.isNixCats then
 
   later(function()
     for _, source in ipairs(PLUGIN_SOURCES) do
-      m_add({ source = source })
+      add({ source = source })
     end
   end)
 end
 
 local function get_codecompanion_config()
   return {
+    adapters = {
+      acp = {
+        -- Codex = heavy agent lane (ChatGPT Edu login via `codex login`; ~/.codex/auth.json).
+        -- Requires `codex-acp` on PATH (~/.nix-profile/bin). ACP-only slash commands in the
+        -- chat buffer: /resume (restore a past session, fresh chat only), /mode (switch agent
+        -- mode), /command, /acp_session_options (e.g. model per session); `\` triggers ACP
+        -- command completion (1-5s delay after chat open).
+        codex = function()
+          return require("codecompanion.adapters").extend("codex", {
+            defaults = {
+              auth_method = "chatgpt",
+            },
+          })
+        end,
+      },
+    },
     interactions = {
       chat = {
         adapter = {
           name = "copilot",
-          model = "gemini-3.1-pro-preview",
+          model = "claude-sonnet-5",
+        },
+        slash_commands = {
+          ["share"] = {
+            opts = {
+              token = os.getenv("GITHUB_GIST_TOKEN"),
+            },
+          },
         },
         opts = {
           completion_provider = "blink",
+          context_management = {
+            editing = {
+              trigger = 0.65,
+              keep_cycles = 3,
+              exclude_tools = { "memory" },
+            },
+            compaction = {
+              trigger = 0.85,
+              min_token_savings = 10000,
+            },
+          },
         },
       },
       inline = {
         adapter = {
           name = "copilot",
-          model = "gemini-3.1-pro-preview",
-        }
-      },
-      keymaps = {
-        accept_change = {
-          modes = { n = "ga" },
-          description = "Accept the suggested change",
+          model = "gpt-5-mini",
         },
-        reject_change = {
-          modes = { n = "gr" },
-          opts = { nowait = true },
-          description = "Reject the suggested change",
+      },
+      shared = {
+        keymaps = {
+          accept_change = {
+            modes = { n = "ga" },
+            description = "Accept the suggested change",
+          },
+          reject_change = {
+            modes = { n = "gr" },
+            opts = { nowait = true },
+            description = "Reject the suggested change",
+          },
+        },
+      },
+      background = {
+        adapter = {
+          name = "copilot",
+          model = "gpt-5-mini",
+        },
+        chat = {
+          callbacks = {
+            ["on_ready"] = {
+              actions = { "interactions.background.builtin.chat_make_title" },
+              enabled = true,
+            },
+          },
+          opts = {
+            enabled = true,
+          },
         },
       },
     },
@@ -121,12 +164,38 @@ local function get_codecompanion_config()
           height = 0.33,
         },
       },
+      diff = {
+        enabled = true,
+        threshold_for_chat = 6,
+      },
+    },
+    rules = {
+      default = {
+        description = "Collection of common files for all projects",
+        files = {
+          ".clinerules",
+          ".cursorrules",
+          ".rules",
+          ".github/copilot-instructions.md",
+          "AGENT.md",
+          "AGENTS.md",
+          { path = "CLAUDE.md", parser = "claude" },
+          { path = "CLAUDE.local.md", parser = "claude" },
+          { path = "~/.claude/CLAUDE.md", parser = "claude" },
+        },
+      },
+      opts = {
+        chat = {
+          autoload = "default",
+          enabled = true,
+        },
+      },
     },
     prompt_library = {
       ["expert"] = {
         interaction = "chat",
         description = "Get expert advice from an LLM",
-        --opts = create_common_opts("<localleader>ae", "expert"),
+        opts = { alias = "expert" },
         prompts = {
           {
             role = "system",
@@ -146,7 +215,7 @@ local function get_codecompanion_config()
       ["fixer"] = {
         interaction = "chat",
         description = "Fix code errors with expert guidance",
-        --opts = create_common_opts("<localleader>af", "afixer"),
+        opts = { alias = "fixer" },
         prompts = {
           {
             role = "system",
@@ -166,7 +235,7 @@ local function get_codecompanion_config()
       ["suggest"] = {
         interaction = "chat",
         description = "Suggest improvements to the buffer",
-        --opts = create_common_opts("<localleader>as", "suggest"),
+        opts = { alias = "suggest" },
         prompts = {
           {
             role = "system",
@@ -188,7 +257,53 @@ local function get_codecompanion_config()
           },
         },
       },
-    }
+      ["agent"] = {
+        interaction = "chat",
+        description = "Agentic coding with the @{agent} tool group (read/edit/grep/run)",
+        opts = { alias = "agent" },
+        prompts = {
+          {
+            role = "user",
+            content = function(context)
+              return "@{agent} Work on the following code:\n\n" .. get_code_block(context) .. "\n\n"
+            end,
+            opts = { contains_code = true },
+          },
+        },
+      },
+      ["tdd"] = {
+        interaction = "chat",
+        description = "Workflow: plan the buffer change, implement it, run the tests",
+        opts = { alias = "tdd", is_workflow = true },
+        prompts = {
+          {
+            {
+              role = "user",
+              content = function(context)
+                return "Let's work test-driven. First, study #buffer and the relevant parts of the codebase, then propose a concise implementation plan (no code yet).\n\nThe code under discussion:\n\n"
+                  .. get_code_block(context)
+                  .. "\n\nThe task: "
+              end,
+              opts = { contains_code = true },
+            },
+          },
+          {
+            {
+              role = "user",
+              content = "Implement the plan now, writing or updating tests alongside the code. @{agent}",
+              opts = { auto_submit = true },
+            },
+          },
+          {
+            {
+              role = "user",
+              content = "Run the project's test suite with @{run_command} and fix any failures until it passes.",
+              opts = { auto_submit = true },
+            },
+          },
+        },
+      },
+    },
   }
 end
 
@@ -244,6 +359,13 @@ later(function()
 end)
 
 
+-- CodeCompanion habit notes (chat buffer unless stated):
+--   /compact  compact history, keep summary        /fork    fork the conversation
+--   /symbols  insert symbols for a file            /share   export chat to a GitHub gist
+--   gm        toggle "btw" ephemeral message       gty      YOLO: approve all tool calls
+--   gba/gbd   buffer sync add/drop                 gd       debug window (adapter/tools info)
+--   Codex (ACP) lane: /resume (fresh chat only), /mode, /command, /acp_session_options,
+--   `\` ACP command completion. Prompt library: /expert /fixer /suggest /agent /tdd (workflow).
 later(function()
   add("codecompanion.nvim")
 
@@ -316,7 +438,10 @@ now_if_args(function()
     },
     snippets = { preset = "mini_snippets" },
     sources = {
-      default = { "references", "lsp", "path", "snippets", "buffer", "omni", "copilot", "codecompanion" },
+      per_filetype = {
+        codecompanion = { "codecompanion" },
+      },
+      default = { "references", "lsp", "path", "snippets", "buffer", "omni", "copilot" },
       providers = {
         path = {
           score_offset = 50,
@@ -334,10 +459,6 @@ now_if_args(function()
           enabled = false,
           score_offset = 10,
           opts = { cmp_name = "cmdline" }
-        },
-        cmp_r = {
-          name = "cmp_r",
-          module = "blink.compat.source",
         },
         copilot = {
           name = "copilot",

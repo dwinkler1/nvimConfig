@@ -4,10 +4,10 @@ local later = MiniDeps.later
 local nix = require('config.nix')
 
 if not Config.isNixCats then
-  local m_add = MiniDeps.add
+  local add = MiniDeps.add
   later(function()
-    m_add({ source = "Bilal2453/luvit-meta" })
-    m_add({ source = "folke/lazydev.nvim" })
+    add({ source = "Bilal2453/luvit-meta" })
+    add({ source = "folke/lazydev.nvim" })
   end)
 end
 

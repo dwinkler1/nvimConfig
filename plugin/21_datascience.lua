@@ -5,18 +5,18 @@ local add = Config.add
 local nix = require('config.nix')
 
 if not Config.isNixCats then
-  local m_add = MiniDeps.add
+  local add = MiniDeps.add
 
   now(function()
-    m_add({ source = "R-nvim/R.nvim" })
+    add({ source = "R-nvim/R.nvim" })
   end)
 
   now_if_args(function()
-    m_add({ source = "jmbuhr/otter.nvim" })
+    add({ source = "jmbuhr/otter.nvim" })
   end)
 
   later(function()
-    m_add({ source = "jpalardy/vim-slime" })
+    add({ source = "jpalardy/vim-slime" })
   end)
 end
 
@@ -44,12 +44,6 @@ end)
 -- r
 now(function()
   if nix.get_cat("r", false) then
-    local cwd = vim.fn.getcwd(-1)
-    vim.env.RNVIM_COMPLDIR = cwd .. "/.r-compl"
-    vim.env.R_LIBS_USER = (vim.env.R_LIBS_USER or ""):gsub("%$PWD", cwd)
-    vim.env.TMPDIR = cwd .. "/.r-tmp"
-    vim.fn.mkdir(vim.env.RNVIM_COMPLDIR, "p")
-    vim.fn.mkdir(vim.env.TMPDIR, "p")
     vim.g.rout_follow_colorscheme = true
     require("r").setup({
       -- Create a table with the options to be passed to setup()
@@ -62,6 +56,20 @@ now(function()
       rconsole_height = 20,
       nvimpager = "split_h",
       pdfviewer = "",
+      -- Use R.nvim's built-in rnvimserver-backed language server. Do not
+      -- configure the external R languageserver through plugin/25_lsp.lua.
+      r_ls = {
+        completion = true,
+        hover = true,
+        signature = true,
+        definition = true,
+        references = true,
+        implementation = true,
+        document_symbol = true,
+        workspace_symbol = true,
+        document_highlight = true,
+        rename = true,
+      },
     })
   end
 end)
@@ -69,8 +77,6 @@ end)
 
 -- Quarto
 now(function()
-  vim.treesitter.language.register("markdown", { "quarto", "rmd" })
-
   if nix.get_cat({ "r", "markdown" }, false) then
     vim.api.nvim_create_autocmd("FileType", {
       pattern = { "quarto" },
