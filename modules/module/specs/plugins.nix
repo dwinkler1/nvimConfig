@@ -4,6 +4,7 @@
   lib,
   ...
 }: {
+
   config.specs.gitPlugins = lib.mkIf (config.cats.gitPlugins or false) {
     data = [];
   };
