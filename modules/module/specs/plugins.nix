@@ -112,12 +112,16 @@
       nvim-treesitter-context
       nvim-treesitter-textobjects
       {
+        data = pkgs.vimPlugins.nvim-treesitter;
+        pname = "nvim-treesitter";
+      }
+      {
         data = pkgs.codecompanion-nvim.overrideAttrs (old: {
           doCheck = false;
         });
         pname = "codecompanion";
       }
-    ];
+    ] ++ builtins.attrValues pkgs.vimPlugins.nvim-treesitter.queries;
   };
 
   config.specs.treesitterParsers = lib.mkIf (config.cats.treesitterParsers or false) {
