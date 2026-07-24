@@ -233,15 +233,19 @@
       }
     );
 
-    nixosModules.default = wrappers.lib.mkInstallModule {
+    nixosModules.default = wrappers.lib.getInstallModule {
       name = "vModule";
       value = module;
     };
 
-    homeModules.default = wrappers.lib.mkInstallModule {
+    homeModules.default = wrappers.lib.getInstallModule {
       name = "vModule";
-      value = module;
-      loc = ["home" "packages"];
+      value = [
+        module
+        {
+          config.install.optionLocation = [ "home" "packages" ];
+        }
+      ];
     };
   };
 }
