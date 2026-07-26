@@ -40,5 +40,5 @@ Config.leader_group_clues = {
   { mode = 'x', keys = '<Leader>r',  desc = '+R' },
   { mode = 'n', keys = '<Leader>z',  desc = '+ZK' },
   { mode = 'n', keys = '<Leader>zr', desc = '+Reviews' },
-  { mode = 'x', keys = '<leader>a',  desc = '+AI' },
+  { mode = 'x', keys = '<Leader>a',  desc = '+AI' },
 }

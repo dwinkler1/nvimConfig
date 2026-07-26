@@ -163,6 +163,10 @@ nmap_leader('rm', '<Cmd>RSend Rcpp::compileAttributes()<CR>', 'Run examples')
 nmap_leader('rT', '<Cmd>RSend testthat::test_file("%")<CR>', 'Test file')
 nmap_leader('rt', '<Cmd>RSend devtools::test()<CR>', 'Test')
 
+-- Visual `<leader>r` bindings (dispatched by the filetype-aware REPL
+-- runner in `lua/keymap/repl.lua`). Previously the visual clue group was
+-- empty, so this restores parity between the visual and normal `r`-group.
+xmap_leader('rr', function() require('keymap.repl').send_selection() end, 'Send selection to REPL')
 -- - Copy to clipboard and make reprex (which itself is loaded to clipboard)
 xmap_leader('rx', '"+y :RSend reprex::reprex()<CR>', 'Reprex selection')
 
