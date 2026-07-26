@@ -1,3 +1,4 @@
+local Config = require('config')
 local now_if_args = Config.now_if_args
 
 if not Config.isNixCats then
@@ -16,6 +17,40 @@ now_if_args(function()
     marksman = {
       filetypes = { "markdown", "markdown_inline", "codecompanion" },
     },
+    nil_ls = {
+      settings = {
+        ["nil"] = {
+          formatting = {
+            command = { "alejandra" },
+          },
+        },
+      },
+    },
+    nixd = {
+      settings = {
+        nixd = {
+          formatting = {
+            command = { "alejandra" },
+          },
+          options = {
+            -- Downstream flakes can override these via lib.mkMerge on the lsp config.
+            nixos = { expr = "(builtins.getFlake \"/etc/nixos\").nixosConfigurations.\"default\".options" },
+            home_manager = { expr = "(builtins.getFlake \"/etc/nixos\").homeConfigurations.\"default\".options" },
+          },
+        },
+      },
+    },
+    yamlls = {
+      settings = {
+        yaml = {
+          schemas = {
+            ["https://raw.githubusercontent.com/quarto-dev/quarto-cli/main/src/resources/schema/project.json"] = "**/_quarto.yml",
+            ["https://raw.githubusercontent.com/quarto-dev/quarto-cli/main/src/resources/schema/document-quarto.json"] = "**/*.qmd",
+          },
+        },
+      },
+    },
+    texlab = {},
     julials = {
       settings = {
         julia = {

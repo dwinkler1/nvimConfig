@@ -1,3 +1,5 @@
+local Config = require('config')
+
 local M = {}
 
 -- Helper function to normalize input to a list

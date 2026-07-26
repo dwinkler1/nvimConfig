@@ -1,7 +1,5 @@
-_G.Config = {}
-local nix = require('config.nix').init { non_nix_value = true }
-Config.isNixCats = nix.is_nix
-Config.nixConfig = nix
+local Config = require('config')
+_G.Config = Config -- keep global alias for keymaps/backward compatibility
 
 require('lze').register_handlers(require('nixCatsUtils.lzUtils').for_cat)
 
@@ -12,8 +10,11 @@ if not Config.isNixCats then
   local mini_path = path_package .. 'pack/deps/start/mini.nvim'
   if not vim.uv.fs_stat(mini_path) then
     vim.cmd('echo "Installing `mini.nvim`" | redraw')
+    -- Pin to the stable branch for reproducible non-Nix installs.
+    -- Change the tag/branch here if you need a newer version.
+    local mini_nvim_tag = 'stable'
     local clone_cmd = {
-      'git', 'clone', '--filter=blob:none',
+      'git', 'clone', '--filter=blob:none', '--branch=' .. mini_nvim_tag,
       'https://github.com/echasnovski/mini.nvim', mini_path
     }
     vim.fn.system(clone_cmd)

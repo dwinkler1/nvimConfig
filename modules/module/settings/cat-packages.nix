@@ -5,6 +5,10 @@
   ...
 }:
 let
+  -- Include packages from a category only if that category is enabled.
+  -- NOTE: The package list expression is still evaluated (packages in Nix are
+  -- lazy by default, so derivations are not built), so keep side-effecting
+  -- expressions out of these lists.
   maybe = cat: pkgsList:
     lib.optionals (config.cats.${cat} or false) pkgsList;
   rPackages = (pkgs.baseRPackages or [ ]) ++ config.settings.lang_packages.r;
@@ -26,6 +30,7 @@ in
     clickhouse = maybe "clickhouse" (with pkgs; [ clickhouse-lts ]);
 
     external = maybe "external" (with pkgs; [
+      nodejs
       perl
       ruby
       shfmt
@@ -40,10 +45,13 @@ in
     lua = maybe "lua" (with pkgs; [ lua-language-server ]);
 
     markdown = maybe "markdown" (with pkgs; [
-      python313Packages.pylatexenc
+      python3Packages.pylatexenc
       quartoPkg
       zk
       marksman
+      texlab
+      imagemagick
+      luaPackages.magick
     ]);
 
     nix = maybe "nix" (with pkgs; [
@@ -88,7 +96,6 @@ in
     in
       with pkgs; [
         python_with_packages
-        nodejs
         ruff
         basedpyright
         uv

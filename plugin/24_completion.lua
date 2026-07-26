@@ -1,3 +1,4 @@
+local Config = require('config')
 local add = Config.add
 local later = MiniDeps.later
 local now = MiniDeps.now

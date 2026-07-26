@@ -3,7 +3,53 @@
   pkgs,
   lib,
   ...
-}: {
+}:
+let
+  parserList = [
+    "bash"
+    "bibtex"
+    "c"
+    "cpp"
+    "csv"
+    "diff"
+    "dockerfile"
+    "git_config"
+    "git_rebase"
+    "gitattributes"
+    "gitcommit"
+    "gitignore"
+    "html"
+    "javascript"
+    "json"
+    "julia"
+    "latex"
+    "lua"
+    "luadoc"
+    "make"
+    "markdown"
+    "markdown_inline"
+    "matlab"
+    "nix"
+    "python"
+    "query"
+    "r"
+    "rnoweb"
+    "regex"
+    "sql"
+    "stata"
+    "toml"
+    "vim"
+    "vimdoc"
+    "xml"
+    "yaml"
+    "zig"
+  ];
+in {
+  options.settings.treesitter_parsers = lib.mkOption {
+    type = lib.types.listOf lib.types.str;
+    default = parserList;
+    description = "Tree-sitter parser names to install when the treesitterParsers category is enabled.";
+  };
 
   config.specs.gitPlugins = lib.mkIf (config.cats.gitPlugins or false) {
     data = [];
@@ -94,6 +140,7 @@
     data = with pkgs.vimPlugins; [
       quarto-nvim
       render-markdown-nvim
+      vimtex
       {
         data = otter-nvim;
         pname = "otter";
@@ -125,42 +172,7 @@
   };
 
   config.specs.treesitterParsers = lib.mkIf (config.cats.treesitterParsers or false) {
-    data = with pkgs.vimPlugins.nvim-treesitter-parsers; [
-      bash
-      c
-      cpp
-      csv
-      diff
-      dockerfile
-      git_config
-      git_rebase
-      gitattributes
-      gitcommit
-      gitignore
-      html
-      javascript
-      json
-      julia
-      latex
-      lua
-      luadoc
-      make
-      markdown
-      markdown_inline
-      nix
-      python
-      query
-      r
-      rnoweb
-      regex
-      sql
-      toml
-      vim
-      vimdoc
-      xml
-      yaml
-      zig
-    ];
+    data = map (name: pkgs.vimPlugins.nvim-treesitter-parsers.${name}) config.settings.treesitter_parsers;
   };
 
   config.specs.utils-lazy = lib.mkIf (config.cats.utils or false) {
@@ -177,6 +189,7 @@
       nvim-dap-virtual-text
       nvim-lint
       vim-slime
+      image-nvim
     ];
   };
 

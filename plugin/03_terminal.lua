@@ -1,3 +1,5 @@
+local Config = require('config')
+
 local M = {}
 
 -- Configuration
@@ -31,11 +33,15 @@ function M.split_and_open_terminal()
   vim.cmd("resize " .. math.floor(vim.fn.winheight(0) * 0.9))
   local term_buf = vim.api.nvim_win_get_buf(vim.api.nvim_get_current_win())
   M.opt_term = term_buf
-  
+
   -- Set buffer-local variables for vim-slime
   local job_id = vim.b[term_buf].terminal_job_id
+  if not job_id then
+    vim.notify("Terminal job id not available", vim.log.levels.WARN)
+    return term_buf
+  end
   vim.b[term_buf].slime_config = { jobid = job_id }
-  
+
   return M.opt_term
 end
 
@@ -44,26 +50,45 @@ function M.open_in_terminal(cmd)
   local command = cmd or ""
   local current_window = vim.api.nvim_get_current_win()
   local code_buf = vim.api.nvim_get_current_buf()
-  
+
+  if not vim.api.nvim_buf_is_valid(code_buf) then
+    vim.notify("Code buffer is not valid", vim.log.levels.ERROR)
+    return
+  end
+
   -- Open terminal and get buffer
   local term_buf = M.split_and_open_terminal()
-  
+
+  if not term_buf or not vim.api.nvim_buf_is_valid(term_buf) then
+    vim.notify("Failed to open terminal buffer", vim.log.levels.ERROR)
+    return
+  end
+
   -- Send command if provided
+  local job_id = vim.b[term_buf].terminal_job_id
   if command ~= "" then
-    -- We can use standard slime sending if needed, or direct chan_send for initialization
-    local job_id = vim.b[term_buf].terminal_job_id
-    if job_id then
-      vim.api.nvim_chan_send(job_id, command .. "\r")
+    if not job_id then
+      vim.notify("Terminal job not ready, cannot send command", vim.log.levels.WARN)
+    else
+      local ok, err = pcall(vim.api.nvim_chan_send, job_id, command .. "\r")
+      if not ok then
+        vim.notify("Failed to send command to terminal: " .. tostring(err), vim.log.levels.ERROR)
+      end
     end
   end
-  
+
   -- Configure slime for the ORIGINAL code buffer to point to this new terminal
   -- This makes "Send to Terminal" work immediately
-  local slime_config = { jobid = vim.b[term_buf].terminal_job_id }
-  
-  -- Fix: Set the variable on the captured code buffer, not the current (terminal) buffer
-  vim.api.nvim_buf_set_var(code_buf, "slime_config", slime_config)
-  
+  if job_id then
+    local slime_config = { jobid = job_id }
+
+    -- Fix: Set the variable on the captured code buffer, not the current (terminal) buffer
+    local ok, err = pcall(vim.api.nvim_buf_set_var, code_buf, "slime_config", slime_config)
+    if not ok then
+      vim.notify("Failed to set slime_config on code buffer: " .. tostring(err), vim.log.levels.ERROR)
+    end
+  end
+
   -- Switch back to code buffer
   vim.api.nvim_set_current_win(current_window)
 end

@@ -44,6 +44,8 @@
         data_table
         janitor
         styler
+        vscDebugger
+        lintr
       ])
     );
     julia = lib.mkDefault [
