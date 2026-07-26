@@ -24,7 +24,11 @@ later(function()
   end
 
   image.setup({
-    backend = "auto",
+    -- Backend is intentionally NOT set so image.nvim auto-detects the
+    -- graphics protocol (kitty / wezterm / iterm / sixel) at runtime and
+    -- falls back to no rendering on unsupported terminals. The literal
+    -- strings "auto" / "none" are not accepted by image.nvim.setup(), so
+    -- setting either would silently disable rendering everywhere.
     integrations = {
       markdown = {
         enabled = true,

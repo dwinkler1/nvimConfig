@@ -70,6 +70,7 @@ in {
     lazy = true;
     data = [
       config.nvim-lib.neovimPlugins.cmp-pandoc-references
+      pkgs.vimPlugins.image-nvim
     ];
   };
 
@@ -184,11 +185,20 @@ in {
       colorful-menu-nvim
       conform-nvim
       copilot-lua
+      nvim-lint
+      vim-slime
+    ];
+  };
+
+  -- Lazy-loaded plugins needed when the `r` cat is on. Kept separate from
+  -- `utils-lazy` so users with `r=true` and `utils=false` still get the
+  -- R debugger (via vscDebugger) and in-buffer image rendering for plots.
+  config.specs.r-lazy = lib.mkIf (config.cats.r or false) {
+    lazy = true;
+    data = with pkgs.vimPlugins; [
       nvim-dap
       nvim-dap-ui
       nvim-dap-virtual-text
-      nvim-lint
-      vim-slime
       image-nvim
     ];
   };
