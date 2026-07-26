@@ -50,7 +50,9 @@ now_if_args(function()
         },
       },
     },
-    texlab = {},
+    texlab = {
+      single_file_support = true,
+    },
     julials = {
       settings = {
         julia = {

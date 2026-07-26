@@ -6,6 +6,6 @@ require('keymap.core')
 require('keymap.leader')
 require('keymap.terminal')
 
--- Re-export the shared config table for backwards compatibility with any
--- external code or keymap strings that still reference the global `Config`.
-_G.Config = Config
+-- `_G.Config` is set by `init.lua:2` once at start-up; no need to re-export
+-- here. The single source of truth is `init.lua` so future refactors don't
+-- have to chase which file currently publishes the alias.

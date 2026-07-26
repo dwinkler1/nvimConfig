@@ -34,7 +34,7 @@ end
 Config.execute_lua_line = function()
   local line = 'lua ' .. vim.api.nvim_get_current_line()
   vim.api.nvim_command(line)
-  print(line)
+  vim.notify(line, vim.log.levels.INFO)
   vim.api.nvim_input('<Down>')
 end
 

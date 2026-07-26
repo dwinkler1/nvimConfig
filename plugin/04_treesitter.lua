@@ -121,11 +121,17 @@ function M.setup_keybindings(global_nodes)
   vim.keymap.set('n', '<localleader>a', function() smart_send.send_repl(current_global_nodes) end,
     { noremap = true, silent = true, desc = "Send node to REPL", buffer = true })
 
-  vim.keymap.set({ 'n', 'i' }, '<S-CR>', function() smart_send.send_repl(current_global_nodes) end,
-    { noremap = true, silent = true, desc = "Send node to REPL", buffer = true })
-
-  vim.keymap.set('n', '<CR>', function() smart_send.send_repl(current_global_nodes) end,
-    { noremap = true, silent = true, desc = "Send node to REPL", buffer = true })
+  -- Both `<CR>` and `<S-CR>` were removed from `M.setup_keybindings`. They
+  -- were hard, implicit overrides that clobbered Vim/filetype defaults and
+  -- the user's snippet + insert-mode workflows (see C2 + H5 in the PR
+  -- review). To opt back in for a specific filetype, override per-buffer
+  -- from a `ftplugin/<lang>.lua`:
+  --
+  --   -- e.g. ftplugin/r.lua or ftplugin/quarto.lua
+  --   vim.keymap.set('n', '<CR>', function()
+  --     require('config').treesitter_helpers.setup_keybindings(global_nodes)
+  --     require('nix_smart_send').send_repl(global_nodes)
+  --   end, { buffer = true, desc = 'Send node to REPL' })
 
   vim.keymap.set('n', '<localleader>n',
     function() current_global_nodes = M.add_global_node(current_global_nodes) end,

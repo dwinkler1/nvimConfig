@@ -24,7 +24,7 @@ later(function()
   end
 
   image.setup({
-    backend = "kitty",
+    backend = "auto",
     integrations = {
       markdown = {
         enabled = true,
