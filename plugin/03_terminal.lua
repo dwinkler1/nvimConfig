@@ -1,5 +1,9 @@
 local Config = require('config')
 
+-- vim-slime target: use Neovim's built-in terminal.
+-- Must be set before any slime send happens.
+vim.g.slime_target = "neovim"
+
 local M = {}
 
 -- Configuration

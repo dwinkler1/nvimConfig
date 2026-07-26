@@ -88,6 +88,12 @@ function M.move_to_next_non_empty_line(current_node)
     return false
   end
 
+  -- Walk up the tree until we find a node with a next named sibling,
+  -- so we escape nested blocks when we are on the last statement.
+  while node and not node:next_named_sibling() do
+    node = node:parent()
+  end
+
   node = node:next_named_sibling()
   while node do
     if not COMMENT_TYPES[node:type()] then
@@ -129,15 +135,11 @@ function M.select_until_global(global_nodes)
 end
 
 function M.slime_send_region()
-  if vim.fn.exists('*slime#send_op') == 0 then
-    vim.notify("slime plugin not available", vim.log.levels.ERROR)
-    return
-  end
-
-  local slime_command = ":<C-u>call slime#send_op(visualmode(), 1)<CR>"
-  local termcodes = vim.api.nvim_replace_termcodes(slime_command, true, true, true)
-
-  vim.api.nvim_feedkeys(termcodes, "x", true)
+  vim.api.nvim_feedkeys(
+    vim.api.nvim_replace_termcodes("<Plug>SlimeRegionSend", true, false, true),
+    "m",
+    false
+  )
 end
 
 function M.send_repl(global_nodes)
@@ -155,15 +157,14 @@ function M.send_repl(global_nodes)
     target_node = next_node
   end
 
-  -- Select the target node and send it to the REPL.
-  if not M.vselect_node(target_node) then
+  -- Extract node text and send directly to avoid visual-mode/feedkeys races.
+  local ok, text = pcall(vim.treesitter.get_node_text, target_node, 0)
+  if not ok or not text then
+    vim.notify("Could not extract code from Tree-sitter node", vim.log.levels.WARN)
     return
   end
-  M.slime_send_region()
 
-  -- Place cursor at end of visual block
-  local _, _, er, ec = target_node:range()
-  vim.api.nvim_win_set_cursor(0, { er + 1, ec })
+  vim.fn["slime#send"](text .. "\n")
 
   -- Jump to the next relevant AST node instead of scanning lines
   M.move_to_next_non_empty_line(target_node)
