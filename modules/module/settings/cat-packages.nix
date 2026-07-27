@@ -25,7 +25,9 @@ in
   };
 
   config.catPkgs = {
-    always = maybe "always" (with pkgs; [ ]);
+    always = maybe "always" (with pkgs; [
+      ripgrep
+    ]);
 
     clickhouse = maybe "clickhouse" (with pkgs; [ clickhouse-lts ]);
 
