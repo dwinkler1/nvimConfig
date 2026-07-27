@@ -51,7 +51,6 @@ in
       marksman
       texlab
       imagemagick
-      luaPackages.magick
     ]);
 
     nix = maybe "nix" (with pkgs; [
