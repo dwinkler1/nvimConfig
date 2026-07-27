@@ -53,6 +53,7 @@ in
       marksman
       texlab
       imagemagick
+      harper
     ]);
 
     nix = maybe "nix" (with pkgs; [
