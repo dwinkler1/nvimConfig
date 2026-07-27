@@ -11,23 +11,18 @@ later(function()
     return
   end
 
+  -- vimtex is a VimL plugin: it does not expose a Lua module.  Configure it
+  -- via globals before loading so the plugin picks them up on startup.
+  vim.g.vimtex_compiler_method = "latexmk"
+  vim.g.vimtex_compiler_latexmk = {
+    -- Keep conservative defaults: no continuous background compilation and no
+    -- callback chatter.  Manual :VimtexCompile still works on demand.
+    continuous = 0,
+    callback = 0,
+  }
+  -- Let vimtex choose the first available viewer (zathura, Skim, Evince, ...).
+
   Config.add("vimtex")
-
-  local ok, vimtex = pcall(require, "vimtex")
-  if not ok then
-    vim.notify("vimtex not available", vim.log.levels.WARN)
-    return
-  end
-
-  -- Keep conservative defaults: latexmk continuous compilation off, single
-  -- viewer (zathura falls back to Evince on most setups).
-  vimtex.setup({
-    enabled = true,
-    compile_on_save = false,
-    compiler = "latexmk",
-    -- Avoid hooking spell/formatting into our global <leader> group;
-    -- vimtex stashes its own <localleader> mappings automatically.
-  })
 
   -- Filetype detection is normally on, but force it explicitly so .tex files
   -- opened outside Quarto still pick up the LSP + viewer hooks.
