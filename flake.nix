@@ -69,7 +69,9 @@
       ''
       + nixpkgs.lib.optionalString (config.cats.r or false) ''
         export R_HOME=$(R RHOME)
-        export R_LIBS_SITE=$(strings "$(command -v R)" | rg -o '/nix/store/[^:]+/library' | sort -u | paste -sd: -)
+        # Use R itself to discover the library paths, avoiding a dependency on
+        # ripgrep/strings/grep in the devShell PATH.
+        export R_LIBS_SITE=$(Rscript -e 'cat(.libPaths(), sep = ":")')
         export R_LIBS_USER="$PWD/.r-libs"
         mkdir -p "$R_LIBS_USER"
       '';
