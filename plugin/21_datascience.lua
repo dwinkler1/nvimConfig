@@ -22,7 +22,6 @@ end
 
 -- terminal
 later(function()
-  vim.g.slime_target = "neovim"
   vim.g.slime_no_mappings = true
   add("vim-slime")
   vim.g.slime_cell_delimiter = vim.g.slime_cell_delimiter or "# %%"

@@ -5,6 +5,10 @@
   ...
 }:
 let
+  # Include packages from a category only if that category is enabled.
+  # NOTE: Package list expressions are lazily evaluated, and derivations are
+  # not built until needed, so keep side-effecting expressions out of these
+  # lists.
   maybe = cat: pkgsList:
     lib.optionals (config.cats.${cat} or false) pkgsList;
   rPackages = (pkgs.baseRPackages or [ ]) ++ config.settings.lang_packages.r;
@@ -21,11 +25,14 @@ in
   };
 
   config.catPkgs = {
-    always = maybe "always" (with pkgs; [ ]);
+    always = maybe "always" (with pkgs; [
+      ripgrep
+    ]);
 
     clickhouse = maybe "clickhouse" (with pkgs; [ clickhouse-lts ]);
 
     external = maybe "external" (with pkgs; [
+      nodejs
       perl
       ruby
       shfmt
@@ -40,10 +47,12 @@ in
     lua = maybe "lua" (with pkgs; [ lua-language-server ]);
 
     markdown = maybe "markdown" (with pkgs; [
-      python313Packages.pylatexenc
+      python3Packages.pylatexenc
       quartoPkg
       zk
       marksman
+      texlab
+      imagemagick
     ]);
 
     nix = maybe "nix" (with pkgs; [
@@ -88,7 +97,6 @@ in
     in
       with pkgs; [
         python_with_packages
-        nodejs
         ruff
         basedpyright
         uv

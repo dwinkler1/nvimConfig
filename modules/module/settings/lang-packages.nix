@@ -44,6 +44,11 @@
         data_table
         janitor
         styler
+        # vscDebugger is not on CRAN/Bioconductor, so it is not available in
+        # pkgs.rpkgs.rPackages. Install it manually in your R library if you
+        # want to use the nvim-dap R adapter (see plugin/26_dap.lua).
+        # vscDebugger
+        lintr
       ])
     );
     julia = lib.mkDefault [

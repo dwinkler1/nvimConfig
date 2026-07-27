@@ -1,3 +1,5 @@
+local Config = require('config')
+
 -- Global Functions
 Config.new_scratch_buffer = function() vim.api.nvim_win_set_buf(0, vim.api.nvim_create_buf(true, true)) end
 
@@ -32,7 +34,7 @@ end
 Config.execute_lua_line = function()
   local line = 'lua ' .. vim.api.nvim_get_current_line()
   vim.api.nvim_command(line)
-  print(line)
+  vim.notify(line, vim.log.levels.INFO)
   vim.api.nvim_input('<Down>')
 end
 

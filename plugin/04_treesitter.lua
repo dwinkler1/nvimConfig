@@ -1,3 +1,5 @@
+local Config = require('config')
+
 local M = {}
 
 -- Default parsers list moved from startup config
@@ -93,12 +95,12 @@ end
 function M.get_type()
   local cur_node = smart_send.get_current_node()
   if not cur_node then
-    print("Not a node")
+    vim.notify("No Tree-sitter node under cursor", vim.log.levels.WARN)
     return nil
   end
 
   local node_type = cur_node:type()
-  print("Node type: " .. node_type)
+  vim.notify("Node type: " .. node_type, vim.log.levels.INFO)
   return node_type
 end
 
@@ -119,11 +121,17 @@ function M.setup_keybindings(global_nodes)
   vim.keymap.set('n', '<localleader>a', function() smart_send.send_repl(current_global_nodes) end,
     { noremap = true, silent = true, desc = "Send node to REPL", buffer = true })
 
-  vim.keymap.set({ 'n', 'i' }, '<S-CR>', function() smart_send.send_repl(current_global_nodes) end,
-    { noremap = true, silent = true, desc = "Send node to REPL", buffer = true })
-
-  vim.keymap.set('n', '<CR>', function() smart_send.send_repl(current_global_nodes) end,
-    { noremap = true, silent = true, desc = "Send node to REPL", buffer = true })
+  -- Both `<CR>` and `<S-CR>` were removed from `M.setup_keybindings`. They
+  -- were hard, implicit overrides that clobbered Vim/filetype defaults and
+  -- the user's snippet + insert-mode workflows (see C2 + H5 in the PR
+  -- review). To opt back in for a specific filetype, override per-buffer
+  -- from a `ftplugin/<lang>.lua`:
+  --
+  --   -- e.g. ftplugin/r.lua or ftplugin/quarto.lua
+  --   vim.keymap.set('n', '<CR>', function()
+  --     require('config').treesitter_helpers.setup_keybindings(global_nodes)
+  --     require('nix_smart_send').send_repl(global_nodes)
+  --   end, { buffer = true, desc = 'Send node to REPL' })
 
   vim.keymap.set('n', '<localleader>n',
     function() current_global_nodes = M.add_global_node(current_global_nodes) end,
@@ -134,8 +142,8 @@ function M.setup_keybindings(global_nodes)
     { noremap = true, silent = true, desc = "Remove node under cursor from globals", buffer = true })
 
   vim.keymap.set('n', '<localleader>o', function()
-    pout = table.concat(global_nodes, ', ') .. ""
-    print(pout)
+    local pout = table.concat(global_nodes, ', ')
+    vim.notify("global_nodes: " .. pout, vim.log.levels.INFO)
   end, { noremap = true, silent = true, desc = "Print globals", buffer = true })
 
   vim.keymap.set('n', '<localleader>p', function() M.get_type() end,
@@ -143,5 +151,47 @@ function M.setup_keybindings(global_nodes)
 end
 
 Config.treesitter_helpers = M
+
+-- Tree-sitter text objects: functions, calls, and assignments are especially
+-- useful when editing R/tidyverse pipelines (e.g. `df |> mutate(...)`).
+local ts_ok, treesitter = pcall(require, "nvim-treesitter.configs")
+if ts_ok then
+  treesitter.setup({
+    textobjects = {
+      select = {
+        enable = true,
+        lookahead = true,
+        keymaps = {
+          ["af"] = "@function.outer",
+          ["if"] = "@function.inner",
+          ["ac"] = "@call.outer",
+          ["ic"] = "@call.inner",
+          ["aa"] = "@assignment.outer",
+          ["ia"] = "@assignment.inner",
+        },
+        selection_modes = {
+          ["@function.outer"] = "V",
+          ["@function.inner"] = "V",
+          ["@call.outer"] = "v",
+          ["@call.inner"] = "v",
+          ["@assignment.outer"] = "v",
+          ["@assignment.inner"] = "v",
+        },
+      },
+      move = {
+        enable = true,
+        set_jumps = true,
+        goto_next_start = {
+          ["]f"] = "@function.outer",
+          ["]c"] = "@call.outer",
+        },
+        goto_previous_start = {
+          ["[f"] = "@function.outer",
+          ["[c"] = "@call.outer",
+        },
+      },
+    },
+  })
+end
 
 return M

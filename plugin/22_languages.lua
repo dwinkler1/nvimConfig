@@ -1,3 +1,5 @@
+local Config = require('config')
+
 local add = Config.add
 local now_if_args = Config.now_if_args
 local later = MiniDeps.later
@@ -28,6 +30,68 @@ later(function()
       },
     })
   end
+end)
+
+-- Linting (via nvim-lint)
+later(function()
+  Config.add("nvim-lint")
+  local lint_ok, lint = pcall(require, "lint")
+  if not lint_ok then
+    return
+  end
+
+  -- R code style via lintr (must be available in the R runtime).
+  -- lintr::lint() returns a "lints" object; format() turns it into the
+  -- standard "file:line:col: severity: message" lines.
+  lint.linters.lintr = {
+    cmd = "Rscript",
+    stdin = false,
+    args = {
+      "-e",
+      "args <- commandArgs(trailingOnly=TRUE); l <- lintr::lint(args[1]); if (length(l) > 0) cat(paste(format(l), collapse='\\n'), '\\n')",
+    },
+    append_fname = true,
+    stream = "both",
+    ignore_exitcode = true,
+    parser = function(output, bufnr, linter_cwd)
+      local diagnostics = {}
+      -- Pattern: /path/file.R:10:5: style: Some message
+      for line in output:gmatch("[^\r\n]+") do
+        local path, lnum, col, severity, message = line:match("^[^:]+:(%d+):(%d+):%s*(%w+):%s*(.+)$")
+        if path then
+          local severity_map = {
+            style = vim.diagnostic.severity.INFO,
+            warning = vim.diagnostic.severity.WARN,
+            error = vim.diagnostic.severity.ERROR,
+          }
+          table.insert(diagnostics, {
+            bufnr = bufnr,
+            lnum = math.max(0, tonumber(lnum) - 1),
+            col = math.max(0, tonumber(col) - 1),
+            end_lnum = tonumber(lnum) - 1,
+            end_col = tonumber(col),
+            severity = severity_map[severity:lower()] or vim.diagnostic.severity.WARN,
+            message = message or "lintr issue",
+            source = "lintr",
+          })
+        end
+      end
+      return diagnostics
+    end,
+  }
+
+  lint.linters_by_ft = {
+    r = { "lintr" },
+    rmd = { "lintr" },
+    quarto = { "lintr" },
+  }
+
+  vim.api.nvim_create_autocmd({ "BufReadPost", "BufWritePost", "InsertLeave" }, {
+    group = vim.api.nvim_create_augroup("LintOnEvents", { clear = true }),
+    callback = function()
+      lint.try_lint()
+    end,
+  })
 end)
 
 -- Markdown
