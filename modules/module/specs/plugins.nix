@@ -36,7 +36,6 @@ let
     "rnoweb"
     "regex"
     "sql"
-    "stata"
     "toml"
     "vim"
     "vimdoc"
