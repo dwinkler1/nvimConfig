@@ -78,6 +78,7 @@ in {
       lze
       lzextras
       plenary-nvim
+      vimtex
       neogit
       {
         data = mini-nvim;
@@ -140,7 +141,6 @@ in {
     data = with pkgs.vimPlugins; [
       quarto-nvim
       render-markdown-nvim
-      vimtex
       {
         data = otter-nvim;
         pname = "otter";
