@@ -17,6 +17,37 @@ now_if_args(function()
     marksman = {
       filetypes = { "markdown", "markdown_inline", "codecompanion" },
     },
+    harper_ls = {
+      cmd = { "harper-ls", "--stdio" },
+      filetypes = { "markdown", "quarto", "text", "tex", "typst" },
+      root_markers = { ".git", ".harper" },
+      settings = {
+        ["harper-ls"] = {
+          linters = {
+            SpellCheck = true,
+            SpelledNumbers = false,
+            AnA = true,
+            SentenceCapitalization = true,
+            UnclosedQuotes = true,
+            WrongApostrophe = false,
+            LongSentences = true,
+            RepeatedWords = true,
+            Spaces = true,
+            CorrectNumberSuffix = true,
+          },
+          codeActions = {
+            ForceStable = false,
+          },
+          markdown = {
+            IgnoreLinkTitle = false,
+          },
+          diagnosticSeverity = "hint",
+          isolateEnglish = false,
+          dialect = "American",
+          maxFileLength = 120000,
+        },
+      },
+    },
     nil_ls = {
       settings = {
         ["nil"] = {
