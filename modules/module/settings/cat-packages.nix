@@ -6,9 +6,9 @@
 }:
 let
   # Include packages from a category only if that category is enabled.
-  # NOTE: The package list expression is still evaluated (packages in Nix are
-  # lazy by default, so derivations are not built), so keep side-effecting
-  # expressions out of these lists.
+  # NOTE: Package list expressions are lazily evaluated, and derivations are
+  # not built until needed, so keep side-effecting expressions out of these
+  # lists.
   maybe = cat: pkgsList:
     lib.optionals (config.cats.${cat} or false) pkgsList;
   rPackages = (pkgs.baseRPackages or [ ]) ++ config.settings.lang_packages.r;
