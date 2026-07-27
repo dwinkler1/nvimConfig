@@ -189,9 +189,9 @@ in {
     ];
   };
 
-  -- Lazy-loaded plugins needed when the `r` cat is on. Kept separate from
-  -- `utils-lazy` so users with `r=true` and `utils=false` still get the
-  -- R debugger (via vscDebugger) and in-buffer image rendering for plots.
+  # Lazy-loaded plugins needed when the `r` cat is on. Kept separate from
+  # `utils-lazy` so users with `r=true` and `utils=false` still get the
+  # R debugger (via vscDebugger) and in-buffer image rendering for plots.
   config.specs.r-lazy = lib.mkIf (config.cats.r or false) {
     lazy = true;
     data = with pkgs.vimPlugins; [
