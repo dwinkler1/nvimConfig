@@ -55,21 +55,24 @@ later(function()
     ignore_exitcode = true,
     parser = function(output, bufnr, linter_cwd)
       local diagnostics = {}
-      -- Pattern: /path/file.R:10:5: style: Some message
+      -- Expected format: /path/file.R:10:5: style: Some message
+      local severity_map = {
+        style = vim.diagnostic.severity.INFO,
+        warning = vim.diagnostic.severity.WARN,
+        error = vim.diagnostic.severity.ERROR,
+      }
       for line in output:gmatch("[^\r\n]+") do
-        local path, lnum, col, severity, message = line:match("^[^:]+:(%d+):(%d+):%s*(%w+):%s*(.+)$")
-        if path then
-          local severity_map = {
-            style = vim.diagnostic.severity.INFO,
-            warning = vim.diagnostic.severity.WARN,
-            error = vim.diagnostic.severity.ERROR,
-          }
+        -- Capture the file path as well so lnum/col line up with the numbers.
+        local path, lnum, col, severity, message = line:match("^(.-):(%d+):(%d+):%s*(%w+):%s*(.+)$")
+        if path and lnum and col and severity then
+          local line_num = tonumber(lnum)
+          local col_num = tonumber(col)
           table.insert(diagnostics, {
             bufnr = bufnr,
-            lnum = math.max(0, tonumber(lnum) - 1),
-            col = math.max(0, tonumber(col) - 1),
-            end_lnum = tonumber(lnum) - 1,
-            end_col = tonumber(col),
+            lnum = math.max(0, line_num - 1),
+            col = math.max(0, col_num - 1),
+            end_lnum = line_num - 1,
+            end_col = col_num,
             severity = severity_map[severity:lower()] or vim.diagnostic.severity.WARN,
             message = message or "lintr issue",
             source = "lintr",

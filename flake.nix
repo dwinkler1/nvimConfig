@@ -230,6 +230,12 @@
           nvim --headless -u NONE -c "set runtimepath+=${./.}" -l ${./tests/init.lua}
           touch $out
         '';
+
+        smoke-test = pkgs.runCommand "smoke-test" {} ''
+          BINARY_PATH="${defaultNvimPkg}/bin/vv"
+          "$BINARY_PATH" --headless -c "luafile ${./tests/smoke.lua}" -c "qa!"
+          touch $out
+        '';
       }
     );
 

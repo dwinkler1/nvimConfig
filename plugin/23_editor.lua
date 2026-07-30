@@ -37,7 +37,13 @@ later(function()
 end)
 
 later(function()
-  require("mini.align").setup()
+  -- Keep `ga` free for CodeCompanion's "accept change" mapping.
+  require("mini.align").setup({
+    mappings = {
+      start = "gA",
+      start_with_preview = "g<C-A>",
+    },
+  })
 end)
 
 later(function()
