@@ -242,6 +242,12 @@
         '';
 
         smoke-test = pkgs.runCommand "smoke-test" {} ''
+          # The Nix build sandbox has a read-only HOME; point XDG dirs at a
+          # writable location so vim.lsp/shaDa can write state headlessly.
+          export XDG_CONFIG_HOME=$TMPDIR/xdg-config
+          export XDG_STATE_HOME=$TMPDIR/xdg-state
+          export XDG_CACHE_HOME=$TMPDIR/xdg-cache
+          export XDG_DATA_HOME=$TMPDIR/xdg-data
           BINARY_PATH="${defaultNvimPkg}/bin/vv"
           "$BINARY_PATH" --headless -c "luafile ${./tests/smoke.lua}" -c "qa!"
           touch $out

@@ -29,7 +29,6 @@ end
 local function get_blink_fuzzy_setting()
   return {
     sorts = { "exact", "score", "sort_text" },
-    use_frecency = true,
     use_proximity = true,
   }
 end

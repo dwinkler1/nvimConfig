@@ -19,6 +19,23 @@ later(function()
     return
   end
   require('bloocky').setup({
+    week_start = "monday",
+    window = {
+      -- Width per view: fraction of the editor width (or absolute columns if > 1).
+      -- A single number applies to every view.
+      width = {
+        month = 0.99,
+        week = 0.99,
+        day = 0.8,
+      },
+      border = "rounded",
+    },
+    integrations = {
+      dooing = {
+        enabled = true,    -- show Dooing todos on their due date
+        show_done = false, -- also show completed todos
+      },
+    },
     keymaps = {
       toggle = '<leader>cb',
     },

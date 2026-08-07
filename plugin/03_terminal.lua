@@ -18,7 +18,7 @@ local defaults = {
   duckdb = "duckdb",
   julia = "julia",
   python = "ipython",
-  shell = "echo 'Hello " .. vim.env.USER .. "!'",
+  shell = "echo 'Hello " .. (vim.env.USER or "user") .. "!'",
 }
 
 -- Registry of terminal commands
