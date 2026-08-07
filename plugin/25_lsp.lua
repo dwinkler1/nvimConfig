@@ -15,7 +15,7 @@ now_if_args(function()
     basedpyright = {},
     ruff = {},
     marksman = {
-      filetypes = { "markdown", "markdown_inline", "codecompanion" },
+      filetypes = { "markdown", "markdown_inline" },
     },
     harper_ls = {
       cmd = { "harper-ls", "--stdio" },

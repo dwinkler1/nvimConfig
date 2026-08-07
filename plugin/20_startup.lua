@@ -191,7 +191,7 @@ end)
 -- Treesitter
 
 now_if_args(function()
-  vim.treesitter.language.register("markdown", { "markdown", "codecompanion", "rmd", "quarto" })
+  vim.treesitter.language.register("markdown", { "markdown", "rmd", "quarto" })
 
   require 'treesitter-context'.setup {
     enable = true,
@@ -216,7 +216,7 @@ now_if_args(function()
     "julia", "rnoweb", "latex", "gitcommit", "gitignore",
     "git_config", "git_rebase", "diff", "dockerfile",
     "make", "xml", "zig", "regex", "csv", "bash",
-    "markdown_inline", "quarto", "rmd", "codecompanion",
+    "markdown_inline", "quarto", "rmd",
   }
   local function start_treesitter(buf, filetype)
     local lang = vim.treesitter.language.get_lang(filetype) or filetype

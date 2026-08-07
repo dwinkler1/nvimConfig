@@ -80,6 +80,8 @@ in {
       plenary-nvim
       vimtex
       neogit
+      config.nvim-lib.neovimPlugins.bloocky
+      config.nvim-lib.neovimPlugins.dooing
       {
         data = mini-nvim;
         pname = "mini.nvim";
@@ -163,10 +165,8 @@ in {
         pname = "nvim-treesitter";
       }
       {
-        data = pkgs.codecompanion-nvim.overrideAttrs (old: {
-          doCheck = false;
-        });
-        pname = "codecompanion";
+        data = pkgs.vimPlugins.opencode-nvim;
+        pname = "opencode.nvim";
       }
     ] ++ builtins.attrValues pkgs.vimPlugins.nvim-treesitter.queries;
   };

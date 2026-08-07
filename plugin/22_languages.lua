@@ -102,7 +102,7 @@ now_if_args(function()
   add("render-markdown.nvim")
   require('render-markdown').setup({
     --    completions = { blink = { enabled = true } },
-    file_types = { 'markdown', 'codecompanion', },
+    file_types = { 'markdown', },
     link = {
       wiki = {
         body = function(ctx)

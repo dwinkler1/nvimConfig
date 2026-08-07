@@ -1,0 +1,13 @@
+WRN 2026-07-31T16:36:01.037 ?.50508    server_start:197: Failed to start server: operation not permitted: /tmp/nvim.daniel/TN25Kv/nvim.50508.0
+WRN 2026-07-31T16:36:38.634 ?.50644    server_start:197: Failed to start server: operation not permitted: /tmp/nvim.daniel/6jT8As/nvim.50644.0
+WRN 2026-07-31T16:46:12.752 ?.54395    server_start:197: Failed to start server: operation not permitted: /tmp/nvim.daniel/zY36Oi/nvim.54395.0
+WRN 2026-07-31T17:01:43.138 ?.58656    server_start:197: Failed to start server: operation not permitted: /tmp/nvim.daniel/nDisRA/nvim.58656.0
+WRN 2026-07-31T17:01:50.641 ?.58696    server_start:197: Failed to start server: operation not permitted: /tmp/nvim.daniel/okDyqb/nvim.58696.0
+WRN 2026-07-31T17:02:04.773 ?.58741    server_start:197: Failed to start server: operation not permitted: /tmp/nvim.daniel/5wxfRu/nvim.58741.0
+WRN 2026-07-31T17:02:29.644 ?.58854    server_start:197: Failed to start server: operation not permitted: /tmp/nvim.daniel/OMTfpB/nvim.58854.0
+WRN 2026-07-31T17:02:29.644 ?.58852    server_start:197: Failed to start server: operation not permitted: /tmp/nvim.daniel/QZvLy2/nvim.58852.0
+WRN 2026-07-31T17:14:31.289 ?.64329    server_start:197: Failed to start server: operation not permitted: /tmp/nvim.daniel/zh9tLm/nvim.64329.0
+WRN 2026-07-31T17:14:40.017 ?.64399    server_start:197: Failed to start server: operation not permitted: /tmp/nvim.daniel/pGaDez/nvim.64399.0
+WRN 2026-07-31T17:17:48.228 ?.64921    server_start:197: Failed to start server: operation not permitted: /tmp/nvim.daniel/ryMpX0/nvim.64921.0
+WRN 2026-07-31T17:17:52.664 ?.64953    server_start:197: Failed to start server: operation not permitted: /tmp/nvim.daniel/X7RmXh/nvim.64953.0
+WRN 2026-07-31T17:18:00.691 ?.64989    server_start:197: Failed to start server: operation not permitted: /tmp/nvim.daniel/C6njjq/nvim.64989.0

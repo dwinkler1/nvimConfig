@@ -37,7 +37,6 @@ later(function()
 end)
 
 later(function()
-  -- Keep `ga` free for CodeCompanion's "accept change" mapping.
   require("mini.align").setup({
     mappings = {
       start = "gA",
@@ -219,6 +218,8 @@ later(function()
   local minikeymap = require("mini.keymap")
   minikeymap.setup()
   local map_multistep = minikeymap.map_multistep
+  -- blink_next/blink_prev/blink_accept are blink.cmp actions.
+  -- Direct blink keymaps (C-space/C-l) are set in 24_completion.lua.
   local tab_steps = {
     "blink_next",
     "pmenu_next",

@@ -55,6 +55,10 @@ local function wait_for_deferred(timeout_ms)
   -- Fire VimEnter so startup autocmds run, then drain the event loop so
   -- mini.deps' deferred setup closures have a chance to execute before we
   -- assert anything.
+  -- The headless smoke run has no start screen to display. Disabling
+  -- mini.starter also prevents it from replacing the current buffer and
+  -- trying to create a swap file in the read-only Nix sandbox.
+  vim.g.ministarter_disable = true
   vim.cmd('doautocmd VimEnter')
   vim.wait(timeout_ms, function() return false end, 50)
 end
@@ -91,8 +95,12 @@ end
 -- ---------------------------------------------------------------------------
 local function has_lsp_config(name)
   if vim.lsp and vim.lsp.config then
-    -- vim.lsp.config(name) returns the merged config or {} if none registered.
-    local ok, cfg = pcall(vim.lsp.config, name)
+    -- Neovim 0.12 exposes configs through the callable `vim.lsp.config`
+    -- table; older versions expose a function-like API.
+    local ok, cfg = pcall(function() return vim.lsp.config[name] end)
+    if not ok or type(cfg) ~= 'table' or next(cfg) == nil then
+      ok, cfg = pcall(vim.lsp.config, name)
+    end
     if ok and cfg and next(cfg) ~= nil then
       return true
     end

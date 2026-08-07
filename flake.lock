@@ -22,17 +22,33 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1784796856,
-        "narHash": "sha256-wWFrV5/Qbm+lyt5x20E/bSbfJiGKMo4RCxZV8cl/WZI=",
+        "lastModified": 1785967620,
+        "narHash": "sha256-IItrdb7Puk05RqOBWZYFC5X6Wl1sJmCfh5MWVHw5iMM=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "e2587caef70cea85dd97d7daab492899902dbf5d",
+        "rev": "b7c2ada94fe99c15b0dbcf4d11fd7850b957a436",
         "type": "github"
       },
       "original": {
         "owner": "nixos",
         "ref": "nixos-unstable",
         "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "plugins-bloocky": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1786042339,
+        "narHash": "sha256-8QcoC1bS8pRcwBkW3mqD2vgP9Mu0aCdIy6umZO6mUGM=",
+        "owner": "atiladefreitas",
+        "repo": "bloocky",
+        "rev": "a052c3b1a8126e04b194bb3db3c4c6ca641c0e4e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "atiladefreitas",
+        "repo": "bloocky",
         "type": "github"
       }
     },
@@ -49,6 +65,22 @@
       "original": {
         "owner": "jmbuhr",
         "repo": "cmp-pandoc-references",
+        "type": "github"
+      }
+    },
+    "plugins-dooing": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1785971574,
+        "narHash": "sha256-GtEC5kWcH0DmiYXkzxzNjjfYLfyEb7zpTLQWdi7n3zs=",
+        "owner": "atiladefreitas",
+        "repo": "dooing",
+        "rev": "6748316bc6b4601797fb952a83694cc0a5ef6da2",
+        "type": "github"
+      },
+      "original": {
+        "owner": "atiladefreitas",
+        "repo": "dooing",
         "type": "github"
       }
     },
@@ -76,11 +108,11 @@
     },
     "rixpkgs": {
       "locked": {
-        "lastModified": 1782576256,
-        "narHash": "sha256-KOvpL9DJJmShb64mX9QTjhxHaxE8MizQIqNUAniuJ2E=",
+        "lastModified": 1785776890,
+        "narHash": "sha256-CzzgB1teVbroR/QhGAnsQToUYCDXEZZtFTcISAooASM=",
         "owner": "dwinkler1",
         "repo": "rixpkgs",
-        "rev": "815afc01bc0cc9a2eba80906645bd08f976a4401",
+        "rev": "a54080a58b57d5785dc85901850b817bef2aaf83",
         "type": "github"
       },
       "original": {
@@ -111,7 +143,9 @@
       "inputs": {
         "fran": "fran",
         "nixpkgs": "nixpkgs",
+        "plugins-bloocky": "plugins-bloocky",
         "plugins-cmp-pandoc-references": "plugins-cmp-pandoc-references",
+        "plugins-dooing": "plugins-dooing",
         "r-nvim-nix": "r-nvim-nix",
         "rixpkgs": "rixpkgs",
         "wrappers": "wrappers"

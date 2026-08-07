@@ -5,7 +5,7 @@
   };
 in {
   inherit rpkgs;
-  baseRPackages = [rpkgs.nvimcom];
+  baseRPackages = [rpkgs.nvimcom rpkgs.rPackages.btw];
   rWrapper = rpkgs.rWrapper.override {packages = [];};
   quarto = rpkgs.quarto.override {extraRPackages = [];};
 }

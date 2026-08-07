@@ -11,28 +11,39 @@ nmap_leader('<Tab>', '<Cmd>bnext<CR>', 'Next buffer')
 nmap_leader('<S-Tab>', '<Cmd>bprev<CR>', 'Prev buffer')
 
 -- a is for 'AI'
-nmap_leader("aa", "<cmd>CodeCompanion /agent<CR>", "Agent chat (@{agent} tools)")
-nmap_leader("ac", "<cmd>CodeCompanionChat Toggle<CR>", "Chat Toggle")
-nmap_leader("aC", function()
-  local chat = require("codecompanion").last_chat()
-  if not chat then
-    return vim.notify("No CodeCompanion chat to compact", vim.log.levels.WARN)
-  end
-  require("codecompanion.interactions.chat.context_management.compaction").compact(chat, { min_token_savings = 0 })
-end, "Compact chat")
-nmap_leader("ag", "<cmd>CodeCompanion /commit<CR>", "Generate commit message")
-nmap_leader("ai", "<cmd>CodeCompanionActions<CR>", "Chat Action")
-nmap_leader("al", "<cmd>CodeCompanion /lsp<CR>", "Explain LSP Diagnostics")
-nmap_leader("an", "<cmd>CodeCompanionChat Add<CR>", "Chat New")
-nmap_leader("as", "<cmd>CodeCompanion /suggest<CR>", "Suggest Improvements")
-nmap_leader("aw", "<cmd>CodeCompanion /tdd<CR>", "Workflow: plan, implement, test")
-nmap_leader("ax", "<cmd>CodeCompanion /fixer<CR>", "Code Fixer")
-xmap_leader("aa", "<cmd>CodeCompanion /agent<CR>", "Agent on selection")
-xmap_leader("ae", "<cmd>CodeCompanion /explain<CR>", "Explain Code")
-xmap_leader("af", "<cmd>CodeCompanion /fix<CR>", "Fix Code")
-xmap_leader("ap", "<cmd>CodeCompanion /expert<CR>", "Code Expert")
-xmap_leader("as", "<cmd>CodeCompanion /suggest<CR>", "Suggest Improvements")
-nmap_leader("ak", "<cmd>CodeCompanionChat adapter=codex<CR>", "Chat with Codex")
+nmap_leader("aa", function()
+  require("opencode").ask("@this: ")
+end, "Ask OpenCode about this")
+nmap_leader("ab", function()
+  require("opencode").prompt("Analyse @buffer")
+end, "Analyse buffer")
+nmap_leader("aB", function()
+  require("opencode").prompt("Analyse @buffers")
+end, "Analyse open buffers")
+nmap_leader("ad", function()
+  require("opencode").prompt("Explain @diagnostics and fix the underlying issue")
+end, "Explain/fix diagnostics")
+nmap_leader("an", function()
+  require("opencode").command("session.new")
+end, "New OpenCode session")
+nmap_leader("ap", function()
+  require("opencode").ask("@")
+end, "Ask OpenCode with context")
+nmap_leader("as", function()
+  require("opencode").select()
+end, "Select OpenCode action")
+xmap_leader("aa", function()
+  require("opencode").ask("@this: ")
+end, "Ask OpenCode about selection")
+xmap_leader("af", function()
+  require("opencode").prompt("Fix the selected code and preserve its surrounding API:\n@this")
+end, "Fix selection")
+xmap_leader("ap", function()
+  require("opencode").ask("@")
+end, "Ask OpenCode with context")
+xmap_leader("as", function()
+  require("opencode").select()
+end, "Select OpenCode action")
 
 -- b is for 'buffer'
 nmap_leader('bb', '<Cmd>b#<CR>', 'Alternate')
@@ -214,6 +225,24 @@ nmap_leader("wh", "<C-w>h", "Go to Left Window", { remap = true })
 nmap_leader("wj", "<C-w>j", "Go to Lower Window", { remap = true })
 nmap_leader("wk", "<C-w>k", "Go to Upper Window", { remap = true })
 nmap_leader("wl", "<C-w>l", "Go to Right Window", { remap = true })
+nmap_leader("w>", "<Cmd>vertical resize +5<CR>", "Increase Window Width")
+nmap_leader("w<lt>", "<Cmd>vertical resize -5<CR>", "Decrease Window Width")
+
+local function set_window_width_percent(percent)
+  return function()
+    local target_width = math.max(1, math.floor(vim.o.columns * percent / 100 + 0.5))
+    vim.api.nvim_win_set_width(0, target_width)
+  end
+end
+
+for i = 1, 9 do
+  local percent = i * 10
+  nmap_leader(
+    "w" .. i,
+    set_window_width_percent(percent),
+    string.format("Set Window Width to %d%%", percent)
+  )
+end
 
 nmap_leader("_", "<C-W>s", "Split Window Below", { remap = true })
 nmap_leader("|", "<C-W>v", "Split Window Right", { remap = true })
