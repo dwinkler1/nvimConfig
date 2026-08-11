@@ -148,7 +148,8 @@ nmap_leader('LL', '<Cmd>luafile %<CR><Cmd>echo "Sourced lua"<CR>', 'Source buffe
 nmap_leader('Ls', '<Cmd>lua Config.log_print()<CR>', 'Show log')
 nmap_leader('Lx', '<Cmd>lua Config.execute_lua_line()<CR>', 'Execute `lua` line')
 
--- m is free
+-- m is for 'mark' (checkbox toggling)
+nmap_leader('mc', '<Cmd>ToggleCheckbox<CR>', 'Toggle checkbox')
 
 -- o is for 'other'
 local trailspace_toggle_command = '<Cmd>lua vim.b.minitrailspace_disable = not vim.b.minitrailspace_disable<CR>'

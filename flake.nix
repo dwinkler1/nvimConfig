@@ -171,11 +171,11 @@
             modules = [
               {
                 cats = {
-                  r = false;
+                  r = true;
                   python = true;
                 };
                 settings.lang_packages.python = nixpkgs.lib.mkForce (with pkgs.python3Packages; [
-                  pandas
+                  polars
                 ]);
                 catPkgs.nix = nixpkgs.lib.mkForce [
                   pkgs.alejandra
