@@ -13,16 +13,32 @@ end
 
 local nix = require('config.nix')
 local later = MiniDeps.later
-
+local now = MiniDeps.now
 later(function()
   if not nix.get_cat('general', false) then
     return
   end
-  require('dooing').setup({
+  local dooing = require('dooing')
+  require("dooing").setup({
     keymaps = {
-      toggle_window = '<leader>cd',
-      open_project_todo = '<leader>cD',
-      show_due_notification = '<leader>cN',
+      toggle_window = "<leader>cd",
+      open_project_todo = "<leader>cD",
+      show_due_notification = "<leader>cN",
+      create_nested_task = "<leader>cn", -- Create nested subtask under current todo
+      toggle_priority = "a",
+    },
+    calendar = {
+      week_start_day = "monday",
     },
   })
+  -- Remove Dooing's old defaults.
+  vim.keymap.del("n", "<leader>td")
+  vim.keymap.del("n", "<leader>tD")
+  vim.keymap.del("n", "<leader>tN")
+
+  -- Restore mappings overwritten by Dooing.
+  local helpers = require('keymap.helpers')
+  local nmap_leader = helpers.nmap_leader
+  -- t is for 'terminal'
+  nmap_leader("td", '<Cmd>lua Config.terminal.open_duckdb();Config.terminal.toggle_bracket()<CR>', 'Open DuckDB')
 end)
