@@ -9,14 +9,17 @@ let
   # NOTE: Package list expressions are lazily evaluated, and derivations are
   # not built until needed, so keep side-effecting expressions out of these
   # lists.
-  maybe = cat: pkgsList:
-    lib.optionals (config.cats.${cat} or false) pkgsList;
-  rPackages = (pkgs.baseRPackages or [ ]) ++ config.settings.lang_packages.r;
+  maybe = cat: pkgsList: lib.optionals (config.cats.${cat} or false) pkgsList;
+  rPackages =
+    (pkgs.baseRPackages or [ ])
+    ++ config.settings.langPackageDefaults.r
+    ++ config.settings.lang_packages.r;
   rWrapperPackages = rPackages;
   quartoPkg =
-    if config.cats.r or false
-    then pkgs.rpkgs.quarto.override { extraRPackages = rPackages; }
-    else pkgs.quarto;
+    if config.cats.r or false then
+      pkgs.rpkgs.quarto.override { extraRPackages = rPackages; }
+    else
+      pkgs.quarto;
 in
 {
   options.catPkgs = lib.mkOption {
@@ -25,83 +28,107 @@ in
   };
 
   config.catPkgs = {
-    always = maybe "always" (with pkgs; [
-      ripgrep
-    ]);
+    always = maybe "always" (
+      with pkgs;
+      [
+        ripgrep
+      ]
+    );
 
     clickhouse = maybe "clickhouse" (with pkgs; [ clickhouse-lts ]);
 
-    external = maybe "external" (with pkgs; [
-      nodejs
-      perl
-      ruby
-      shfmt
-      sqlfluff
-      tree-sitter
-    ]);
+    external = maybe "external" (
+      with pkgs;
+      [
+        nodejs
+        perl
+        ruby
+        shfmt
+        sqlfluff
+        tree-sitter
+      ]
+    );
 
     julia = maybe "julia" [
-      (pkgs.julia-bin.withPackages config.settings.lang_packages.julia)
+      (pkgs.julia-bin.withPackages (
+        config.settings.langPackageDefaults.julia ++ config.settings.lang_packages.julia
+      ))
     ];
 
     lua = maybe "lua" (with pkgs; [ lua-language-server ]);
 
-    markdown = maybe "markdown" (with pkgs; [
-      python3Packages.pylatexenc
-      quartoPkg
-      zk
-      marksman
-      texlab
-      imagemagick
-      harper
-    ]);
+    markdown = maybe "markdown" (
+      with pkgs;
+      [
+        python3Packages.pylatexenc
+        quartoPkg
+        zk
+        marksman
+        texlab
+        imagemagick
+        harper
+      ]
+    );
 
-    nix = maybe "nix" (with pkgs; [
-      alejandra
-      nix-doc
-      nixd
-    ]);
+    nix = maybe "nix" (
+      with pkgs;
+      [
+        alejandra
+        nix-doc
+        nixd
+      ]
+    );
 
-    optional = maybe "optional" (with pkgs; [
-      bat
-      broot
-      devenv
-      dust
-      fd
-      fzf
-      gawk
-      gh
-      git
-      hunspell
-      hunspellDicts.de-at
-      hunspellDicts.en-us
-      ispell
-      jq
-      just
-      lazygit
-      man
-      ncdu
-      pigz
-      poppler
-      ripgrep
-      tokei
-      wget
-      yq
-    ]);
+    optional = maybe "optional" (
+      with pkgs;
+      [
+        bat
+        broot
+        devenv
+        dust
+        fd
+        fzf
+        gawk
+        gh
+        git
+        hunspell
+        hunspellDicts.de-at
+        hunspellDicts.en-us
+        ispell
+        jq
+        just
+        lazygit
+        man
+        ncdu
+        pigz
+        poppler
+        ripgrep
+        tokei
+        wget
+        yq
+      ]
+    );
 
-    python = maybe "python" (let
-      python_packages_fn =
-        if pkgs ? basePythonPackages
-        then ps: pkgs.basePythonPackages ps ++ config.settings.lang_packages.python
-        else _: config.settings.lang_packages.python;
-      python_with_packages = pkgs.python3.withPackages python_packages_fn;
-    in
-      with pkgs; [
+    python = maybe "python" (
+      let
+        python_packages_fn =
+          if pkgs ? basePythonPackages then
+            ps:
+            pkgs.basePythonPackages ps
+            ++ config.settings.langPackageDefaults.python
+            ++ config.settings.lang_packages.python
+          else
+            _: config.settings.langPackageDefaults.python ++ config.settings.lang_packages.python;
+        python_with_packages = pkgs.python3.withPackages python_packages_fn;
+      in
+      with pkgs;
+      [
         python_with_packages
         ruff
         basedpyright
         uv
-      ]);
+      ]
+    );
 
     r = maybe "r" [
       (pkgs.rpkgs.rWrapper.override { packages = rWrapperPackages; })

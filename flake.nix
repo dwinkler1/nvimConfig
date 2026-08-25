@@ -29,7 +29,6 @@
       url = "github:jmbuhr/cmp-pandoc-references";
       flake = false;
     };
-
     "plugins-bloocky" = {
       url = "github:atiladefreitas/bloocky";
       flake = false;
@@ -39,6 +38,7 @@
       url = "github:atiladefreitas/dooing";
       flake = false;
     };
+
   };
 
   outputs = {
@@ -216,10 +216,10 @@
             (builtins.length (self.lib.devShellPackages defaultConfig) > 0)
           ];
           overrideAssertions = [
-            (!(overrideConfig.cats.r or false))
+            (overrideConfig.cats.r or false)
             (builtins.length overrideNix == 1)
             ((builtins.head overrideNix) == "alejandra")
-            (builtins.match ".*R RHOME.*" overrideShellHook == null)
+            (builtins.match ".*R RHOME.*" overrideShellHook != null)
           ];
         in
           pkgs.runCommand "check-downstream-overrides" {
@@ -240,6 +240,36 @@
           nvim --headless -u NONE -c "set runtimepath+=${./.}" -l ${./tests/init.lua}
           touch $out
         '';
+
+        # Downstream modules assign settings.lang_packages.<lang> plainly. The
+        # module system replaces same-option defaults, so built-in defaults must
+        # live in langPackageDefaults and be composed at the consumption sites.
+        # This check fails if someone moves defaults back into lang_packages:
+        # then a downstream assignment would silently drop lintr etc.
+        append-semantics = let
+          downstreamCfg = (self.lib.eval {
+            inherit pkgs;
+            modules = [
+              {
+                cats.r = true;
+                settings.lang_packages.r = [ pkgs.rpkgs.rPackages.fixest ];
+              }
+            ];
+          }).config;
+          rWrapperPkg = builtins.head downstreamCfg.catPkgs.r;
+        in
+          pkgs.runCommand "check-lang-packages-append" { } ''
+            script=$(readlink -f "${rWrapperPkg}/bin/R")
+            grep -q "r-lintr-" "$script" || {
+              echo "default R packages were dropped by a downstream lang_packages assignment" >&2
+              exit 1
+            }
+            grep -q "r-fixest-" "$script" || {
+              echo "downstream lang_packages.r additions were not appended" >&2
+              exit 1
+            }
+            echo "lang_packages append semantics OK" > $out
+          '';
 
         smoke-test = pkgs.runCommand "smoke-test" {} ''
           # The Nix build sandbox has a read-only HOME; point XDG dirs at a

@@ -198,7 +198,8 @@ projectSettings = {
 
 ### Language packages (module defaults)
 
-Add Python/R/Julia libraries that get appended to the module defaults. The built-in defaults are:
+Add Python/R/Julia libraries. These are appended to the built-in defaults, which
+always apply (see `settings.langPackageDefaults` in `modules/module/settings/lang-packages.nix`):
 
 - Python: `duckdb`, `polars`
 - R: `arrow`, `broom`, `data_table`, `janitor`, `styler`
@@ -214,7 +215,8 @@ projectSettings = {
 };
 ```
 
-Use `lib.mkForce` to replace rather than append:
+Use `lib.mkForce` to replace other `lang_packages` assignments; the built-in defaults still apply.
+To exclude defaults, override `catPkgs.<cat>` instead:
 
 ```nix
 projectSettings = {
@@ -337,5 +339,5 @@ cats.nix ───────────────► config.cats        │
 - **Overlays** (`overlays/`) inject dependency package sets into nixpkgs (`rpkgs`, `baseRPackages`, `basePythonPackages`, plugins). Top-level `rWrapper` and `quarto` are compatibility conveniences, but `pkgs.rpkgs` is the canonical R surface for downstream configuration.
 - **cat-packages.nix** is the single source of truth for per-category packages. Each list is gated by its cat toggle.
 - **deps.nix** wires `catPkgs` into the wrapper's runtime PATH.
-- **settings.lang_packages** holds the shared defaults used by local outputs and downstream module consumers.
+- **settings.lang_packages** holds project-specific language libraries appended to the built-in `settings.langPackageDefaults`, used by local outputs and downstream module consumers.
 - **flake.nix** exports `lib.eval`, `lib.mkWrapper`, `lib.devShellPackages`, and `lib.shellHook` as the canonical downstream helpers, and builds `packages.default` and `devShells.default` from the same module config.

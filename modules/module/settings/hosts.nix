@@ -5,7 +5,10 @@
   ...
 }:
 let
-  rPackages = (pkgs.baseRPackages or [ ]) ++ config.settings.lang_packages.r;
+  rPackages =
+    (pkgs.baseRPackages or [ ])
+    ++ config.settings.langPackageDefaults.r
+    ++ config.settings.lang_packages.r;
   rWrapperPkg = pkgs.rpkgs.rWrapper.override { packages = rPackages ++ [pkgs.nvimcom]; };
 in
 {
