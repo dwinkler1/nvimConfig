@@ -22,33 +22,17 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1786384358,
-        "narHash": "sha256-RzPPiWeUtuvymnpuEWsdtzli5w4kjZs49FqEs3/1u+I=",
+        "lastModified": 1787498568,
+        "narHash": "sha256-9i/VTdusq/+NM/tz+J1Re+ojkMB8MBf0QshnYfzHz30=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "2fcb964de67fcf60b43471c55d5d99e61a9ccb5a",
+        "rev": "56c02bc00adcf003215cc4bd996d6efaf4cff188",
         "type": "github"
       },
       "original": {
         "owner": "nixos",
         "ref": "nixos-unstable",
         "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
-    "plugins-bloocky": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1786453931,
-        "narHash": "sha256-OpVm/ubj6rxjGFkjluQLhys/qGWqmN3E7dUMiFUYAZw=",
-        "owner": "atiladefreitas",
-        "repo": "bloocky",
-        "rev": "64a6de6560c40b3351d29545528ddaed98cd9984",
-        "type": "github"
-      },
-      "original": {
-        "owner": "atiladefreitas",
-        "repo": "bloocky",
         "type": "github"
       }
     },
@@ -65,22 +49,6 @@
       "original": {
         "owner": "jmbuhr",
         "repo": "cmp-pandoc-references",
-        "type": "github"
-      }
-    },
-    "plugins-dooing": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1786125118,
-        "narHash": "sha256-Iil8eCCz61T1Hz1y2cij71Hti+QGXbjH49eGCPMqTbA=",
-        "owner": "atiladefreitas",
-        "repo": "dooing",
-        "rev": "2871aaf400c49187aa4216e7cf7abfa37cd32840",
-        "type": "github"
-      },
-      "original": {
-        "owner": "atiladefreitas",
-        "repo": "dooing",
         "type": "github"
       }
     },
@@ -108,11 +76,11 @@
     },
     "rixpkgs": {
       "locked": {
-        "lastModified": 1786421894,
-        "narHash": "sha256-BQLZ0kJYdZ3FmC2Vq7PJFmx4wnyifoCdz+5CIkdbDxI=",
+        "lastModified": 1787585894,
+        "narHash": "sha256-tp/kigWpoz0DUyDmbqVHLjZova3n98vn7R7HTRtjeWg=",
         "owner": "dwinkler1",
         "repo": "rixpkgs",
-        "rev": "9518d16a41413cf08eecde557b337b87f1422e91",
+        "rev": "5a76f5802a7728c62feff1399c7302b53276ed8f",
         "type": "github"
       },
       "original": {
@@ -143,9 +111,7 @@
       "inputs": {
         "fran": "fran",
         "nixpkgs": "nixpkgs",
-        "plugins-bloocky": "plugins-bloocky",
         "plugins-cmp-pandoc-references": "plugins-cmp-pandoc-references",
-        "plugins-dooing": "plugins-dooing",
         "r-nvim-nix": "r-nvim-nix",
         "rixpkgs": "rixpkgs",
         "wrappers": "wrappers"
@@ -158,11 +124,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1782135443,
-        "narHash": "sha256-vAmbArdCyjqpVW+37aCy/PMBOLIqukUXLQuEKLwUhA4=",
+        "lastModified": 1787579952,
+        "narHash": "sha256-Dn6IPaLyltx8hBTyC4hgNWDb7T7WHRYUG6wWh6KBHXA=",
         "owner": "BirdeeHub",
         "repo": "nix-wrapper-modules",
-        "rev": "6e7f66fa2cdf4d63162580b438f7fcf87c28a46f",
+        "rev": "b56e973dd2bd62244b44d6542fb52182bc3a3cda",
         "type": "github"
       },
       "original": {

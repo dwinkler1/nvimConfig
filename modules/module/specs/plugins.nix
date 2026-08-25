@@ -80,8 +80,6 @@ in {
       plenary-nvim
       vimtex
       neogit
-      config.nvim-lib.neovimPlugins.bloocky
-      config.nvim-lib.neovimPlugins.dooing
       {
         data = mini-nvim;
         pname = "mini.nvim";

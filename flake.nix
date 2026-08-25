@@ -29,16 +29,6 @@
       url = "github:jmbuhr/cmp-pandoc-references";
       flake = false;
     };
-    "plugins-bloocky" = {
-      url = "github:atiladefreitas/bloocky";
-      flake = false;
-    };
-
-    "plugins-dooing" = {
-      url = "github:atiladefreitas/dooing";
-      flake = false;
-    };
-
   };
 
   outputs = {
